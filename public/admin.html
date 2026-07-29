@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banana Transaction — Админ</title>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin>
+    <link rel="stylesheet" href="css/admin.css?v=7">
+</head>
+<body>
+
+<div class="header">
+    <div class="header-logo">
+        <div class="header-logo-icon"><i class="fas fa-coins"></i></div>
+        <span class="header-logo-name">Banana <em>Transaction</em></span>
+        <span class="header-badge">ADMIN</span>
+    </div>
+    <div class="header-right">
+        <div class="live-indicator">
+            <div class="live-dot"></div>
+            Авто-обновление 30с
+        </div>
+        <button class="refresh-btn" id="refresh-btn" onclick="loadData(this)">
+            <i class="fas fa-sync-alt" id="refresh-icon"></i><span id="refresh-text"> Обновить</span>
+        </button>
+    </div>
+</div>
+
+<div class="main">
+    <div class="page-title">Панель администратора</div>
+    <div class="page-sub" id="last-update">Загрузка данных...</div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon yellow"><i class="fas fa-users"></i></div>
+            <div class="stat-info">
+                <div class="stat-value" id="stat-users">—</div>
+                <div class="stat-label">Пользователей</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="fas fa-sign-in-alt"></i></div>
+            <div class="stat-info">
+                <div class="stat-value" id="stat-logins">—</div>
+                <div class="stat-label">Успешных входов</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon red"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="stat-info">
+                <div class="stat-value" id="stat-failed">—</div>
+                <div class="stat-label">Неудачных попыток</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon orange"><i class="fas fa-key"></i></div>
+            <div class="stat-info">
+                <div class="stat-value" id="stat-resets">—</div>
+                <div class="stat-label">Смен пароля</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="fas fa-exchange-alt"></i></div>
+            <div class="stat-info">
+                <div class="stat-value" id="stat-tx">—</div>
+                <div class="stat-label">Транзакций</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon purple"><i class="fas fa-dollar-sign"></i></div>
+            <div class="stat-info">
+                <div class="stat-value" id="stat-volume">—</div>
+                <div class="stat-label">Объём P2P</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE TAB NAV (only visible on mobile) -->
+    <div class="mob-tabs" id="mob-tabs">
+        <button class="mob-tab active" data-panel="users" onclick="switchPanel('users')">
+            <i class="fas fa-users"></i>
+            <span>Юзеры</span>
+        </button>
+        <button class="mob-tab" data-panel="logs" onclick="switchPanel('logs')">
+            <i class="fas fa-list-alt"></i>
+            <span>Логи</span>
+        </button>
+        <button class="mob-tab" data-panel="txs" onclick="switchPanel('txs')">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Транзакции</span>
+        </button>
+    </div>
+
+    <div class="tables-grid">
+
+        <!-- USERS -->
+        <div class="table-card" data-panel="users">
+            <div class="table-header">
+                <div class="table-title"><i class="fas fa-users"></i> Пользователи</div>
+                <div class="table-controls">
+                    <input class="table-search" id="users-search" placeholder="Поиск..." oninput="dFilterUsers()">
+                    <span class="table-count" id="users-count">0</span>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Пользователь</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-tbody">
+                        <tr><td colspan="3"><div class="loading"><i class="fas fa-spinner"></i></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- LOGS -->
+        <div class="table-card" data-panel="logs">
+            <div class="table-header">
+                <div class="table-title"><i class="fas fa-list-alt"></i> Активность</div>
+                <div class="table-controls">
+                    <select class="table-filter" id="logs-filter" onchange="filterLogs()">
+                        <option value="">Все</option>
+                        <option value="register">Регистрация</option>
+                        <option value="login">Вход</option>
+                        <option value="password_reset">Пароль</option>
+                        <option value="deposit">Пополнение</option>
+                        <option value="withdrawal">Вывод</option>
+                        <option value="transfer">Перевод</option>
+                        <option value="ban">Бан</option>
+                    </select>
+                    <input class="table-search" id="logs-search" placeholder="Email..." oninput="dFilterLogs()">
+                    <span class="table-count" id="logs-count">0</span>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Действие</th>
+                            <th class="col-hide-sm">Email</th>
+                            <th class="col-hide-md">Детали</th>
+                            <th>Статус</th>
+                            <th>Время</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logs-tbody">
+                        <tr><td colspan="5"><div class="loading"><i class="fas fa-spinner"></i></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TRANSACTIONS -->
+        <div class="table-card" data-panel="txs">
+            <div class="table-header">
+                <div class="table-title"><i class="fas fa-exchange-alt"></i> Транзакции</div>
+                <div class="table-controls">
+                    <select class="table-filter" id="txs-filter" onchange="filterTxs()">
+                        <option value="">Все</option>
+                        <option value="transfer">P2P</option>
+                        <option value="deposit">Пополнение</option>
+                        <option value="withdrawal">Вывод</option>
+                    </select>
+                    <input class="table-search" id="txs-search" placeholder="Юзер..." oninput="dFilterTxs()">
+                    <span class="table-count" id="txs-count">0</span>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Тип</th>
+                            <th>От</th>
+                            <th class="col-hide-sm">Кому</th>
+                            <th>Сумма</th>
+                            <th>Время</th>
+                        </tr>
+                    </thead>
+                    <tbody id="txs-tbody">
+                        <tr><td colspan="5"><div class="loading"><i class="fas fa-spinner"></i></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="user-modal" onclick="closeModal(event)">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-user">
+                <div class="modal-avatar" id="modal-avatar"></div>
+                <div>
+                    <div class="modal-username" id="modal-username"></div>
+                    <div class="modal-email" id="modal-email"></div>
+                </div>
+            </div>
+            <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-section-title">Паспорт</div>
+            <div id="modal-passport"></div>
+
+            <div class="modal-section-title">История активности</div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Действие</th>
+                            <th>Статус</th>
+                            <th>IP</th>
+                            <th>Время</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="js/admin.js?v=7"></script>
+<script>
+(function(){
+    document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+    document.addEventListener('keydown', function(e){
+        if (e.key === 'F12') { e.preventDefault(); return false; }
+        if (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key)) { e.preventDefault(); return false; }
+        if (e.ctrlKey && ['u','U'].includes(e.key)) { e.preventDefault(); return false; }
+    });
+    setInterval(function(){
+        if (window.outerWidth - window.innerWidth > 200 || window.outerHeight - window.innerHeight > 200) {
+            document.body.style.filter = 'blur(20px)';
+            document.body.style.pointerEvents = 'none';
+        } else {
+            document.body.style.filter = '';
+            document.body.style.pointerEvents = '';
+        }
+    }, 1000);
+})();
+</script>
+</body>
+</html>

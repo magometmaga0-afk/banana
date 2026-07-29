@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banana Transaction — Вход</title>
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<div class="page-wrapper">
+
+    <!-- ===== ЛЕВАЯ ПАНЕЛЬ (только десктоп) ===== -->
+    <div class="branding-panel">
+        <div class="branding-inner">
+
+            <div class="brand-logo">
+                <div class="brand-logo-icon"><i class="fas fa-coins"></i></div>
+                <div>
+                    <span class="brand-logo-name">Banana <em>Transaction</em></span>
+                    <span class="brand-logo-tag">Быстрые P2P-переводы</span>
+                </div>
+            </div>
+
+            <h2 class="brand-headline">Переводы<br><span>нового поколения</span></h2>
+            <p class="brand-sub">Быстро, безопасно и без скрытых комиссий — отправляй деньги мгновенно в любую точку</p>
+
+            <ul class="brand-features">
+                <li>
+                    <span class="brand-feat-icon"><i class="fas fa-bolt"></i></span>
+                    <span class="brand-feat-text">Мгновенные переводы 24/7</span>
+                </li>
+                <li>
+                    <span class="brand-feat-icon"><i class="fas fa-shield-alt"></i></span>
+                    <span class="brand-feat-text">Банковский уровень защиты</span>
+                </li>
+                <li>
+                    <span class="brand-feat-icon"><i class="fas fa-globe"></i></span>
+                    <span class="brand-feat-text">Доступно с любого устройства</span>
+                </li>
+                <li>
+                    <span class="brand-feat-icon"><i class="fas fa-percent"></i></span>
+                    <span class="brand-feat-text">Минимальные комиссии</span>
+                </li>
+            </ul>
+
+            <div class="brand-demo-card">
+                <div class="brand-demo-header">
+                    <span>Последние переводы</span>
+                    <span class="brand-live-badge"><span class="brand-live-dot"></span> Live</span>
+                </div>
+                <div class="brand-tx-item">
+                    <div class="brand-tx-ava" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);">A</div>
+                    <div class="brand-tx-info">
+                        <span class="brand-tx-name">Alex → Maria</span>
+                        <span class="brand-tx-time">2 сек. назад</span>
+                    </div>
+                    <span class="brand-tx-amt">+5 000 ₽</span>
+                </div>
+                <div class="brand-tx-item">
+                    <div class="brand-tx-ava" style="background:linear-gradient(135deg,#0ea5e9,#0369a1);">K</div>
+                    <div class="brand-tx-info">
+                        <span class="brand-tx-name">Kate → Ivan</span>
+                        <span class="brand-tx-time">1 мин. назад</span>
+                    </div>
+                    <span class="brand-tx-amt">+12 500 ₽</span>
+                </div>
+                <div class="brand-tx-item">
+                    <div class="brand-tx-ava" style="background:linear-gradient(135deg,#10b981,#059669);">D</div>
+                    <div class="brand-tx-info">
+                        <span class="brand-tx-name">Denis → Olga</span>
+                        <span class="brand-tx-time">3 мин. назад</span>
+                    </div>
+                    <span class="brand-tx-amt">+3 200 ₽</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ===== ПРАВАЯ ПАНЕЛЬ (форма) ===== -->
+    <div class="auth-panel">
+        <div class="auth-container">
+            <div class="auth-card">
+
+                <!-- LOGO (только мобильный/планшет) -->
+                <div class="logo">
+                    <div class="logo-icon"><i class="fas fa-coins"></i></div>
+                    <div class="logo-text">
+                        <h1>Banana <span>Transaction</span></h1>
+                        <p class="logo-tagline">Быстрые P2P-переводы</p>
+                    </div>
+                </div>
+
+                <!-- TABS -->
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-tab="login">
+                        <i class="fas fa-sign-in-alt"></i> Вход
+                    </button>
+                    <button class="auth-tab" data-tab="register">
+                        <i class="fas fa-user-plus"></i> Регистрация
+                    </button>
+                </div>
+
+                <!-- ===== ФОРМА ВХОДА ===== -->
+                <form class="auth-form active" id="login-form">
+                    <div class="error-message" id="login-error"></div>
+                    <div class="success-message" id="login-success"></div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" class="form-input" id="login-email" placeholder="your@email.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Пароль</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" class="form-input" id="login-password" placeholder="••••••••" required>
+                            <button type="button" class="toggle-password" tabindex="-1"><i class="fas fa-eye"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="forgot-password"><a href="#" onclick="showForgot(); return false;">Забыли пароль?</a></div>
+
+                    <button type="submit" class="auth-btn">Войти <i class="fas fa-arrow-right"></i></button>
+
+                    <div class="auth-footer">
+                        Нет аккаунта? <a href="#" onclick="switchTab('register'); return false;">Зарегистрироваться</a>
+                    </div>
+                </form>
+
+                <!-- ===== ФОРМА РЕГИСТРАЦИИ ===== -->
+                <form class="auth-form" id="register-form">
+                    <div class="error-message" id="register-error"></div>
+                    <div class="success-message" id="register-success"></div>
+
+                    <div class="form-group">
+                        <label class="form-label">Имя пользователя</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" class="form-input" id="register-username" placeholder="Придумайте никнейм" required>
+                        </div>
+                        <div class="input-hint" id="username-hint"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" class="form-input" id="register-email" placeholder="your@email.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Пароль</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" class="form-input" id="register-password" placeholder="Минимум 8 символов" required>
+                            <button type="button" class="toggle-password" tabindex="-1"><i class="fas fa-eye"></i></button>
+                        </div>
+                        <div class="password-strength">
+                            <div class="strength-bar" id="password-strength-bar"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Подтвердите пароль</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-shield-alt input-icon"></i>
+                            <input type="password" class="form-input" id="register-confirm" placeholder="Повторите пароль" required>
+                            <button type="button" class="toggle-password" tabindex="-1"><i class="fas fa-eye"></i></button>
+                        </div>
+                        <div id="password-match"></div>
+                    </div>
+
+                    <div class="form-group register-otp-section" id="register-otp-section" style="display:none">
+                        <label class="form-label">Код из письма</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-key input-icon"></i>
+                            <input type="text" class="form-input" id="register-code" placeholder="6-значный код" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
+                        </div>
+                        <div id="register-otp-timer" style="font-size:13px;margin-top:6px;color:var(--text-secondary)"></div>
+                        <a href="#" id="register-resend-link" style="font-size:13px;display:none;margin-top:4px" onclick="resendRegOtp(event)">Отправить повторно</a>
+                    </div>
+
+                    <button type="submit" class="auth-btn" id="register-btn">
+                        Продолжить <i class="fas fa-arrow-right"></i>
+                    </button>
+
+                    <div class="auth-footer">
+                        Уже есть аккаунт? <a href="#" onclick="switchTab('login'); return false;">Войти</a>
+                    </div>
+                </form>
+
+                <!-- ===== ФОРМА ВОССТАНОВЛЕНИЯ ПАРОЛЯ ===== -->
+                <div class="auth-form" id="forgot-form">
+
+                    <div class="forgot-header">
+                        <button class="forgot-back-btn" onclick="hideForgot()">
+                            <i class="fas fa-chevron-left"></i> Назад ко входу
+                        </button>
+                        <div class="forgot-title-block">
+                            <div class="forgot-icon-box"><i class="fas fa-key"></i></div>
+                            <h3 class="forgot-title">Восстановление пароля</h3>
+                        </div>
+                    </div>
+
+                    <div class="step-indicator">
+                        <div class="step-dot active" data-step="1"><span>1</span></div>
+                        <div class="step-line"></div>
+                        <div class="step-dot" data-step="2"><span>2</span></div>
+                        <div class="step-line"></div>
+                        <div class="step-dot" data-step="3"><span>3</span></div>
+                    </div>
+                    <div class="step-labels">
+                        <span>Email</span>
+                        <span>Код</span>
+                        <span>Пароль</span>
+                    </div>
+
+                    <div class="error-message" id="forgot-error"></div>
+                    <div class="success-message" id="forgot-success"></div>
+
+                    <div class="forgot-step active" id="forgot-step-1">
+                        <p class="forgot-desc">Введите email вашего аккаунта — мы пришлём код для сброса пароля</p>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-envelope input-icon"></i>
+                                <input type="email" class="form-input" id="forgot-email" placeholder="your@email.com">
+                            </div>
+                        </div>
+                        <button type="button" class="auth-btn" id="forgot-send-btn">
+                            Отправить код <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+
+                    <div class="forgot-step" id="forgot-step-2">
+                        <p class="forgot-desc">Код отправлен на <strong id="forgot-email-display" class="forgot-email-hl"></strong></p>
+                        <div class="form-group">
+                            <label class="form-label">Код подтверждения</label>
+                            <input type="text" class="form-input forgot-code-input" id="forgot-code" placeholder="000000" maxlength="6" inputmode="numeric">
+                            <div id="forgot-timer"></div>
+                        </div>
+                        <button type="button" class="auth-btn" id="forgot-verify-btn">
+                            Подтвердить <i class="fas fa-check"></i>
+                        </button>
+                        <div class="forgot-resend">
+                            Не получили? <a href="#" id="forgot-resend-link">Отправить повторно</a>
+                        </div>
+                    </div>
+
+                    <div class="forgot-step" id="forgot-step-3">
+                        <p class="forgot-desc">Придумайте новый надёжный пароль</p>
+                        <div class="form-group">
+                            <label class="form-label">Новый пароль</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-lock input-icon"></i>
+                                <input type="password" class="form-input" id="forgot-new-password" placeholder="Минимум 8 символов">
+                                <button type="button" class="toggle-password" tabindex="-1"><i class="fas fa-eye"></i></button>
+                            </div>
+                            <div class="password-strength">
+                                <div class="strength-bar" id="forgot-strength-bar"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Подтвердите пароль</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-shield-alt input-icon"></i>
+                                <input type="password" class="form-input" id="forgot-confirm-password" placeholder="Повторите пароль">
+                                <button type="button" class="toggle-password" tabindex="-1"><i class="fas fa-eye"></i></button>
+                            </div>
+                            <div id="forgot-password-match"></div>
+                        </div>
+                        <button type="button" class="auth-btn" id="forgot-reset-btn">
+                            Сменить пароль <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="forgot-step" id="forgot-step-4">
+                        <div class="forgot-success-state">
+                            <div class="forgot-success-icon"><i class="fas fa-check-circle"></i></div>
+                            <h3 class="forgot-success-title">Пароль изменён!</h3>
+                            <p class="forgot-success-sub">Теперь вы можете войти с новым паролем</p>
+                            <button type="button" class="auth-btn" onclick="hideForgot()">
+                                Войти <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- TRUST BADGES -->
+                <div class="trust-badges">
+                    <div class="trust-badge"><i class="fas fa-shield-alt"></i> SSL защита</div>
+                    <div class="trust-badge"><i class="fas fa-lock"></i> 2FA</div>
+                    <div class="trust-badge"><i class="fas fa-user-shield"></i> Шифрование</div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="js/auth.js?v=2"></script>
+<script>
+    document.querySelectorAll('.toggle-password').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const input = this.parentElement.querySelector('input');
+            const icon = this.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Banana Transaction</title>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin>
+    <link rel="stylesheet" href="css/dashboard.css?v=51">
+    <link rel="preload" href="js/dashboard.js?v=34" as="script">
+</head>
+<body>
+
+<div class="app-shell">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sb-head">
+            <div class="sb-logo">
+                <div class="sb-logo-icon"><i class="fas fa-coins"></i></div>
+                <div>
+                    <div class="sb-logo-name">Banana <em>Transaction</em></div>
+                    <div class="sb-logo-tag">P2P Platform</div>
+                </div>
+            </div>
+        </div>
+
+        <nav class="sb-nav">
+            <div class="sb-nav-label">Навигация</div>
+            <button class="sb-item active" data-p="home" onclick="switchPanel('home')">
+                <i class="fas fa-house"></i><span>Главная</span>
+            </button>
+            <button class="sb-item" data-p="card" onclick="switchPanel('card')">
+                <i class="fas fa-credit-card"></i><span>Реквизиты</span>
+            </button>
+
+            <div class="sb-nav-label sb-trader-section" id="sb-trader-label" style="display:none">Трейдер</div>
+            <button class="sb-item sb-trader-section" id="sb-trader-btn" data-p="trader" onclick="switchPanel('trader')" style="display:none">
+                <i class="fas fa-wallet"></i><span>Мои реквизиты</span>
+            </button>
+
+            <div class="sb-nav-label">Информация</div>
+            <button class="sb-item" data-p="advantages" onclick="switchPanel('advantages')">
+                <i class="fas fa-star"></i><span>Преимущества</span>
+            </button>
+            <button class="sb-item" data-p="product" onclick="switchPanel('product')">
+                <i class="fas fa-layer-group"></i><span>Продукт</span>
+            </button>
+            <button class="sb-item" data-p="about" onclick="switchPanel('about')">
+                <i class="fas fa-building"></i><span>О компании</span>
+            </button>
+            <button class="sb-item" data-p="geo" onclick="switchPanel('geo')">
+                <i class="fas fa-globe"></i><span>География</span>
+            </button>
+            <button class="sb-item" data-p="terms" onclick="switchPanel('terms')">
+                <i class="fas fa-file-lines"></i><span>Условия</span>
+            </button>
+            <button class="sb-item" data-p="contact" onclick="switchPanel('contact')">
+                <i class="fas fa-headset"></i><span>Контакт</span>
+            </button>
+
+            <div class="sb-nav-label">Аккаунт</div>
+            <button class="sb-item" data-p="account" onclick="openAccountPanel()">
+                <i class="fas fa-user-gear"></i><span>Настройки</span>
+            </button>
+        </nav>
+
+        <div class="sb-foot">
+            <div class="sb-user-row" onclick="openAccountPanel()" style="cursor:pointer;" title="Аккаунт">
+                <div class="sb-avatar" id="sb-avatar">?</div>
+                <div class="sb-user-info">
+                    <div class="sb-username" id="sb-username">Загрузка...</div>
+                    <div class="sb-status"><span class="status-dot"></span>Онлайн</div>
+                </div>
+                <button class="sb-logout" onclick="logout();event.stopPropagation();" title="Выйти">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Overlay для мобильного sidebar -->
+    <div class="sb-overlay" id="sb-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- ===== MAIN ===== -->
+    <div class="main-area">
+
+        <!-- Мобильная шапка -->
+        <header class="mob-header">
+            <button class="mob-menu" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="mob-logo">
+                <div class="sb-logo-icon sm"><i class="fas fa-coins"></i></div>
+                <span class="sb-logo-name">Banana <em>Transaction</em></span>
+            </div>
+            <div class="mob-right">
+                <div class="header-avatar" id="header-avatar" onclick="openAccountPanel()" style="cursor:pointer;" title="Аккаунт">?</div>
+                <button class="dash-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </header>
+
+        <!-- ============================================================
+             ПАНЕЛЬ: ГЛАВНАЯ
+        ============================================================ -->
+        <div class="d-panel active" id="panel-home">
+            <div class="home-inner">
+
+                <div class="home-top-bar">
+                    <div class="home-top-left">
+                        <i class="fas fa-house"></i>
+                        <span>Главная страница</span>
+                    </div>
+                    <div class="home-top-right">
+                        <div class="rate-widget" id="rate-widget" onclick="toggleCurrencyPicker(event)">
+                            <div class="rate-widget-icon"><i class="fas fa-dollar-sign"></i></div>
+                            <div class="rate-widget-body">
+                                <div class="rate-widget-label">USD / <span id="rate-cur-code">RUB</span> <i class="fas fa-chevron-down rate-chev" id="rate-chev"></i></div>
+                                <div class="rate-widget-val">
+                                    <span id="usd-rate-val">Загрузка...</span>
+                                    <span class="home-rate-change" id="usd-rate-change"></span>
+                                </div>
+                            </div>
+                            <div class="currency-picker" id="currency-picker"></div>
+                        </div>
+                        <button class="home-transfer-btn" onclick="openModal('transfer')">
+                            <i class="fas fa-arrow-right"></i>
+                            <span>Перевести</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="wallet-cards">
+
+                    <div class="wallet-card main-wallet-card" id="hero-card">
+                        <div class="wc-head">
+                            <div class="wc-icon-wrap gold"><i class="fas fa-dollar-sign"></i></div>
+                            <span class="wc-name">USD · Основной баланс</span>
+                            <button class="wc-menu-btn" title="Детали"><i class="fas fa-credit-card"></i></button>
+                        </div>
+                        <div class="wc-balance">
+                            <span id="balance-int">0</span><span class="wc-frac" id="balance-frac">.00</span>
+                            <span class="wc-cur">USDT</span>
+                        </div>
+                        <div class="wc-equiv">≈ <span id="balance-rub">0.00</span> <span id="balance-cur-label">RUB</span></div>
+                        <div class="wc-profit-row">
+                            <span class="wc-profit-badge"><i class="fas fa-chart-line"></i> Доходность: <span id="stat-profit">$0.00</span></span>
+                        </div>
+                    </div>
+
+                    <div class="wallet-card" id="wc-received-card">
+                        <div class="wc-head">
+                            <div class="wc-icon-wrap purple"><i class="fas fa-ruble-sign"></i></div>
+                            <span class="wc-name">Получено</span>
+                            <button class="wc-menu-btn" title="Подробно"><i class="fas fa-credit-card"></i></button>
+                        </div>
+                        <div class="wc-balance green-bal">
+                            <span id="stat-received">$0.00</span>
+                        </div>
+                        <div class="wc-equiv">Транзакций: <span id="stat-count">0</span></div>
+                        <button class="wc-action-btn yellow-wc-btn" onclick="openModal('withdraw')">
+                            <i class="fas fa-arrow-up"></i> Вывести средства
+                        </button>
+                    </div>
+
+                    <div class="wallet-card" id="wc-reserve-card">
+                        <div class="wc-head">
+                            <div class="wc-icon-wrap teal"><i class="fas fa-shield-halved"></i></div>
+                            <span class="wc-name">Замороженные средства</span>
+                            <button class="wc-menu-btn" title="Заморозка"><i class="fas fa-lock"></i></button>
+                        </div>
+                        <div class="wc-balance">
+                            <span id="stat-sent">$0.00</span>
+                        </div>
+                        <div class="wc-equiv">Активные сделки</div>
+                        <button class="wc-action-btn green-wc-btn" onclick="openModal('deposit')">
+                            <i class="fas fa-plus"></i> Пополнить баланс
+                        </button>
+                    </div>
+
+                </div>
+                <div class="wc-dots" id="wc-dots">
+                    <span class="wc-dot active"></span>
+                    <span class="wc-dot"></span>
+                    <span class="wc-dot"></span>
+                </div>
+
+                <div class="content-row">
+                    <div class="history-panel">
+                        <div class="history-head">
+                            <div class="panel-title-row">
+                                <i class="fas fa-clock-rotate-left"></i>
+                                <span>История транзакций</span>  
+                            </div>
+                            <div class="history-controls">
+                                <div class="ftabs">
+                                    <button class="ftab active" data-f="" onclick="setFilter(this,'')">Все</button>
+                                    <button class="ftab" data-f="in" onclick="setFilter(this,'in')">Входящие</button>
+                                    <button class="ftab" data-f="out" onclick="setFilter(this,'out')">Исходящие</button>
+                                    <button class="ftab" data-f="deposit" onclick="setFilter(this,'deposit')">Пополнения</button>
+                                    <button class="ftab" data-f="withdrawal" onclick="setFilter(this,'withdrawal')">Выводы</button>
+                                </div>
+                                <div class="history-search-wrap">
+                                    <i class="fas fa-search"></i>
+                                    <input class="history-search" id="history-search" placeholder="Поиск..." oninput="applyFilter()">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tx-list" id="tx-list">
+                            <div class="tx-loading"><i class="fas fa-spinner fa-spin"></i> Загрузка...</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ============================================================
+             ПАНЕЛЬ: АККАУНТ
+        ============================================================ -->
+        <div class="d-panel info-panel" id="panel-account">
+            <div class="info-wrap" style="max-width:680px">
+
+                <!-- Герой -->
+                <div class="acc-hero">
+                    <div class="acc-avatar-wrap">
+                        <div class="acc-avatar" id="pf-avatar">?</div>
+                        <div class="acc-online-dot"></div>
+                    </div>
+                    <div class="acc-hero-info">
+                        <div class="acc-hero-name" id="pf-username">—</div>
+                        <div class="acc-hero-email" id="pf-info-email">—</div>
+                        <div class="acc-hero-status"><span class="status-dot"></span>Онлайн</div>
+                    </div>
+                </div>
+
+                <!-- Инфо-бейджи -->
+                <div class="acc-badges">
+                    <div class="acc-badge">
+                        <div class="acc-badge-label"><i class="fas fa-user"></i> Логин</div>
+                        <div class="acc-badge-val" id="pf-info-username">—</div>
+                    </div>
+                    <div class="acc-badge">
+                        <div class="acc-badge-label"><i class="fas fa-envelope"></i> Email</div>
+                        <div class="acc-badge-val acc-badge-email" id="acc-email-display">—</div>
+                    </div>
+                    <div class="acc-badge">
+                        <div class="acc-badge-label"><i class="fas fa-id-badge"></i> Роль</div>
+                        <div class="acc-badge-val" id="acc-role-display">—</div>
+                    </div>
+                </div>
+
+                <!-- Настройки -->
+                <div class="acc-section-title">Настройки аккаунта</div>
+
+                <div class="acc-cards">
+
+                    <!-- Изменить логин -->
+                    <div class="acc-card" id="acc-username">
+                        <button class="acc-card-header" onclick="toggleAcc('username')">
+                            <div class="acc-card-icon" style="background:rgba(59,130,246,.1);color:#3B82F6">
+                                <i class="fas fa-user-pen"></i>
+                            </div>
+                            <div class="acc-card-label">
+                                <div class="acc-card-title">Изменить логин</div>
+                                <div class="acc-card-sub">Текущий: <span id="acc-cur-username">—</span></div>
+                            </div>
+                            <i class="fas fa-chevron-down acc-chev"></i>
+                        </button>
+                        <div class="acc-card-body">
+                            <div class="acc-form">
+                                <input type="text" class="acc-input" id="pf-new-username" placeholder="Новый логин (мин. 3 символа)" maxlength="50" autocomplete="off">
+                                <div class="acc-input-wrap">
+                                    <input type="password" class="acc-input" id="pf-user-pass" placeholder="Текущий пароль для подтверждения">
+                                    <button type="button" class="acc-eye" onclick="togglePfPass('pf-user-pass',this)"><i class="fas fa-eye"></i></button>
+                                </div>
+                                <div class="acc-msg" id="pf-user-msg"></div>
+                                <button class="acc-save-btn" onclick="changeUsername(this)"><i class="fas fa-check"></i> Сохранить логин</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Изменить email -->
+                    <div class="acc-card" id="acc-email">
+                        <button class="acc-card-header" onclick="toggleAcc('email')">
+                            <div class="acc-card-icon" style="background:rgba(234,179,8,.1);color:#EAB308">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="acc-card-label">
+                                <div class="acc-card-title">Изменить email</div>
+                                <div class="acc-card-sub">Текущий: <span id="acc-cur-email">—</span></div>
+                            </div>
+                            <i class="fas fa-chevron-down acc-chev"></i>
+                        </button>
+                        <div class="acc-card-body">
+                            <!-- Шаг 1: новый email + пароль -->
+                            <div class="acc-form" id="email-step1">
+                                <input type="email" class="acc-input" id="pf-new-email" placeholder="Новый email адрес" autocomplete="off">
+                                <div class="acc-input-wrap">
+                                    <input type="password" class="acc-input" id="pf-email-pass" placeholder="Текущий пароль для подтверждения">
+                                    <button type="button" class="acc-eye" onclick="togglePfPass('pf-email-pass',this)"><i class="fas fa-eye"></i></button>
+                                </div>
+                                <div class="acc-msg" id="pf-email-msg"></div>
+                                <button class="acc-save-btn" id="pf-email-send-btn" onclick="sendEmailCode(this)"><i class="fas fa-paper-plane"></i> Отправить код</button>
+                            </div>
+                            <!-- Шаг 2: ввод кода -->
+                            <div class="acc-form" id="email-step2" style="display:none">
+                                <div class="email-otp-hint">Код отправлен на вашу текущую почту. Введите его ниже.</div>
+                                <input type="text" class="acc-input acc-input-otp" id="pf-email-code" placeholder="Введите 6-значный код" maxlength="6" autocomplete="one-time-code" inputmode="numeric">
+                                <div class="acc-msg" id="pf-email-code-msg"></div>
+                                <div class="email-otp-actions">
+                                    <button class="acc-save-btn" id="pf-email-confirm-btn" onclick="confirmEmailCode(this)"><i class="fas fa-check"></i> Подтвердить</button>
+                                    <button class="acc-resend-btn" id="pf-email-resend-btn" onclick="resendEmailCode(this)"><i class="fas fa-rotate-right"></i> Отправить снова</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Изменить пароль -->
+                    <div class="acc-card" id="acc-password">
+                        <button class="acc-card-header" onclick="toggleAcc('password')">
+                            <div class="acc-card-icon" style="background:rgba(239,68,68,.1);color:#EF4444">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <div class="acc-card-label">
+                                <div class="acc-card-title">Изменить пароль</div>
+                                <div class="acc-card-sub">Последнее изменение: недавно</div>
+                            </div>
+                            <i class="fas fa-chevron-down acc-chev"></i>
+                        </button>
+                        <div class="acc-card-body">
+                            <div class="acc-form">
+                                <div class="acc-input-wrap">
+                                    <input type="password" class="acc-input" id="pf-cur-pass" placeholder="Текущий пароль">
+                                    <button type="button" class="acc-eye" onclick="togglePfPass('pf-cur-pass',this)"><i class="fas fa-eye"></i></button>
+                                </div>
+                                <div class="acc-input-wrap">
+                                    <input type="password" class="acc-input" id="pf-new-pass" placeholder="Новый пароль (мин. 8 символов)" oninput="checkPfStrength(this.value)">
+                                    <button type="button" class="acc-eye" onclick="togglePfPass('pf-new-pass',this)"><i class="fas fa-eye"></i></button>
+                                </div>
+                                <div class="acc-strength"><div class="acc-strength-bar" id="pf-strength-bar"></div></div>
+                                <div class="acc-input-wrap">
+                                    <input type="password" class="acc-input" id="pf-confirm-pass" placeholder="Повторите новый пароль">
+                                    <button type="button" class="acc-eye" onclick="togglePfPass('pf-confirm-pass',this)"><i class="fas fa-eye"></i></button>
+                                </div>
+                                <div class="acc-msg" id="pf-msg"></div>
+                                <button class="acc-save-btn" id="pf-submit" onclick="changePassword()"><i class="fas fa-check"></i> Сохранить пароль</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Сеансы -->
+                <div class="acc-section-title" style="margin-top:28px">Активные сеансы</div>
+                <div id="sessions-list" class="sessions-list"></div>
+                <div class="sessions-footer" id="sessions-footer" style="display:none">
+                    <button class="sessions-terminate-all" onclick="terminateAllSessions(this)">
+                        <i class="fas fa-right-from-bracket"></i>
+                        Завершить все остальные сеансы
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ============================================================
+             ПАНЕЛЬ: ПРЕИМУЩЕСТВА
+        ============================================================ -->
+        <div class="d-panel info-panel" id="panel-advantages">
+            <div class="info-wrap">
+                <div class="info-hero">
+                    <div class="info-tag">Почему мы</div>
+                    <h1 class="info-title">Преимущества <span>Banana Transaction</span></h1>
+                    <p class="info-sub">Единственная P2P платформа с работой на CIS-рынках, поддержкой всех валют и нулевыми комиссиями</p>
+                </div>
+
+                <div class="adv-grid">
+                    <div class="adv-card">
+                        <div class="adv-icon" style="--ic:#22C55E;--bg:rgba(34,197,94,.1)"><i class="fas fa-bolt"></i></div>
+                        <h3>Мгновенные переводы</h3>
+                        <p>P2P транзакции проходят напрямую без посредников. Деньги приходят на счёт получателя за секунды.</p>
+                    </div>
+                    <div class="adv-card">
+                        <div class="adv-icon" style="--ic:#3B82F6;--bg:rgba(59,130,246,.1)"><i class="fas fa-shield-halved"></i></div>
+                        <h3>Максимальная безопасность</h3>
+                        <p>JWT-аутентификация, bcrypt-хэш паролей и OTP-подтверждение на каждую операцию.</p>
+                    </div>
+                    <div class="adv-card">
+                        <div class="adv-icon" style="--ic:#EAB308;--bg:rgba(234,179,8,.1)"><i class="fas fa-percent"></i></div>
+                        <h3>Нулевые комиссии</h3>
+                        <p>Никаких скрытых сборов и неприятных сюрпризов. Мы зарабатываем честно без потери вашего.</p>
+                    </div>
+                    <div class="adv-card">
+                        <div class="adv-icon" style="--ic:#A855F7;--bg:rgba(168,85,247,.1)"><i class="fas fa-mobile-screen"></i></div>
+                        <h3>Умная аналитика</h3>
+                        <p>Работайте со статистикой, следите за доходами и расходами прямо на дашборде с удобными графиками.</p>
+                    </div>
+                    <div class="adv-card">
+                        <div class="adv-icon" style="--ic:#F97316;--bg:rgba(249,115,22,.1)"><i class="fas fa-globe"></i></div>
+                        <h3>Глобальная сеть</h3>
+                        <p>Работаем в 50+ странах мира. Конвертация из USD в местную валюту происходит автоматически.</p>
+                    </div>
+                    <div class="adv-card">
+                        <div class="adv-icon" style="--ic:#06B6D4;--bg:rgba(6,182,212,.1)"><i class="fas fa-headset"></i></div>
+                        <h3>Поддержка 24/7</h3>
+                        <p>Ответим на любой вопрос в Telegram и email. Среднее время ответа — до 2 часов.</p>
+                    </div>
+                </div>
+
+                <div class="info-stats-row">
+                    <div class="info-stat">
+                        <div class="info-stat-num">50+</div>
+                        <div class="info-stat-label">Стран</div>
+                    </div>
+                    <div class="info-stat-sep"></div>
+                    <div class="info-stat">
+                        <div class="info-stat-num">1 000+</div>
+                        <div class="info-stat-label">Пользователей</div>
+                    </div>
+                    <div class="info-stat-sep"></div>
+                    <div class="info-stat">
+                        <div class="info-stat-num">$500K+</div>
+                        <div class="info-stat-label">Объём транзакций</div>
+                    </div>
+                    <div class="info-stat-sep"></div>
+                    <div class="info-stat">
+                        <div class="info-stat-num">99.9%</div>
+                        <div class="info-stat-label">Uptime</div>
+                    </div>
+                </div>
+            </div>
+            <footer class="site-footer">
+                <div class="footer-inner">
+                    <div class="footer-logo">
+                        <div class="sb-logo-icon sm"><i class="fas fa-coins"></i></div>
+                        <span>Banana <em>Transaction</em></span>
+                    </div>
+                    <div class="footer-links">
+                        <button onclick="switchPanel('terms')">Условия</button>
+                        <button onclick="switchPanel('contact')">Контакты</button>
+                        <button onclick="switchPanel('about')">О нас</button>
+                    </div>
+                    <div class="footer-copy">© 2025–2026 Banana Transaction. Все права защищены.</div>
+                </div>
+            </footer>
+        </div>
+
+        <!-- ============================================================
+             ПАНЕЛЬ: ПРОДУКТ
+        ============================================================ -->
+        <div class="d-panel info-panel" id="panel-product">
+            <div class="info-wrap">
+                <div class="info-hero">
+                    <div class="info-tag">Экосистема</div>
+                    <h1 class="info-title">Наш <span>Продукт</span></h1>
+                    <p class="info-sub">Наша платформа разработана для удобства и безопасного обмена средствами</p>
+                </div>
+
+                <div class="product-list">
+                    <div class="product-item">
+                        <div class="product-num">01</div>
+                        <div class="product-icon" style="--ic:#22C55E;--bg:rgba(34,197,94,.1)">
+                            <i class="fas fa-paper-plane"></i>
+                        </div>
+                        <div class="product-info">
+                            <h3>P2P Переводы</h3>
+                            <p>Отправляйте деньги напрямую другому пользователю по email или @логину. Переводы проходят мгновенно без посредников и скрытых комиссий. Полная история переводов с фильтрацией.</p>
+                        </div>
+                    </div>
+                    <div class="product-item">
+                        <div class="product-num">02</div>
+                        <div class="product-icon" style="--ic:#3B82F6;--bg:rgba(59,130,246,.1)">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <div class="product-info">
+                            <h3>Пополнение баланса</h3>
+                            <p>Пополняйте счёт в один клик. Доступны быстрые суммы ($10, $50, $100, $500, $1000) или введите произвольную сумму. Мгновенное зачисление на основной баланс.</p>
+                        </div>
+                    </div>
+                    <div class="product-item">
+                        <div class="product-num">03</div>
+                        <div class="product-icon" style="--ic:#F97316;--bg:rgba(249,115,22,.1)">
+                            <i class="fas fa-arrow-up-from-bracket"></i>
+                        </div>
+                        <div class="product-info">
+                            <h3>Вывод средств</h3>
+                            <p>Выводите деньги на карту или счёт банка. Заявка обрабатывается с проверкой реквизитов и проходит несколько этапов. Среднее время вывода от нескольких минут до одного банковского дня.</p>
+                        </div>
+                    </div>
+                    <div class="product-item">
+                        <div class="product-num">04</div>
+                        <div class="product-icon" style="--ic:#A855F7;--bg:rgba(168,85,247,.1)">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="product-info">
+                            <h3>Аналитика и статистика</h3>
+                            <p>Следите за историей транзакций с фильтрацией по типу и датам. Доступны показатели: получено, отправлено, пополнения и выводы за весь период на дашборде.</p>
+                        </div>
+                    </div>
+                    <div class="product-item">
+                        <div class="product-num">05</div>
+                        <div class="product-icon" style="--ic:#EAB308;--bg:rgba(234,179,8,.1)">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="product-info">
+                            <h3>OTP-подтверждение операций</h3>
+                            <p>Каждый перевод требует одноразовый код подтверждения операции. Защита от несанкционированных действий на случай утечки или взлома сессии.</p>
+                        </div>
+                    </div>
+                    <div class="product-item">
+                        <div class="product-num">06</div>
+                        <div class="product-icon" style="--ic:#06B6D4;--bg:rgba(6,182,212,.1)">
+                            <i class="fas fa-gauge-high"></i>
+                        </div>
+                        <div class="product-info">
+                            <h3>Высокая производительность</h3>
+                            <p>PostgreSQL с индексами, gzip-сжатие, оптимизация на стороне клиента без задержки при загрузке транзакций. Весь интерфейс под 20 миллисекунд отклика.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="site-footer">
+                <div class="footer-inner">
+                    <div class="footer-logo">
+                        <div class="sb-logo-icon sm"><i class="fas fa-coins"></i></div>
+                        <span>Banana <em>Transaction</em></span>
+                    </div>
+                    <div class="footer-links">
+                        <button onclick="switchPanel('terms')">Условия</button>
+                        <button onclick="switchPanel('contact')">Контакты</button>
+                        <button onclick="switchPanel('about')">О нас</button>
+                    </div>
+                    <div class="footer-copy">© 2025–2026 Banana Transaction. Все права защищены.</div>
+                </div>
+            </footer>
+        </div>
+
+        <!-- ============================================================
+             ПАНЕЛЬ: О КОМПАНИИ
+        ============================================================ -->
+        <div class="d-panel info-panel" id="panel-about">
+            <div class="info-wrap">
+
+                <!-- Лого бренда Banana -->
+                <div class="about-brand-hero">
+                    <div class="about-brand-icon"><i class="fas fa-coins"></i></div>
+                    <div class="about-brand-body">
+                        <div class="info-tag">Платформа</div>
+                        <h1 class="info-title" style="margin-top:10px">Про бренд <span>Banana TX</span></h1>
+                        <p class="about-brand-desc">Banana Transaction — это P2P платформа нового поколения разработанная для международного обмена средствами. На основе трёх ценностей: надёжная транзакция системы, простота интерфейса без лишних шагов, безопасность данных на стороне и доступ к сети со любого устройства. Разработано энтузиастами финансов и программирования.</p>
+                    </div>
+                </div>
+
+                <!-- Цифры бренда -->
+                <div class="about-stats-grid">
+                    <div class="about-stat-card">
+                        <div class="about-stat-icon" style="background:rgba(59,130,246,.1);color:#3B82F6">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div class="about-stat-num">50+</div>
+                        <div class="about-stat-label">Стран присутствия</div>
+                        <div class="about-stat-sub">Азия, Европа, Россия, Ближний Восток</div>
+                    </div>
+                    <div class="about-stat-card">
+                        <div class="about-stat-icon" style="background:rgba(234,179,8,.1);color:#EAB308">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="about-stat-num">10 000+</div>
+                        <div class="about-stat-label">Транзакций в месяц</div>
+                        <div class="about-stat-sub">Стабильный рост объёма переводов</div>
+                    </div>
+                    <div class="about-stat-card">
+                        <div class="about-stat-icon" style="background:rgba(34,197,94,.1);color:#22C55E">
+                            <i class="fas fa-shield-halved"></i>
+                        </div>
+                        <div class="about-stat-num">100%</div>
+                        <div class="about-stat-label">Безопасность</div>
+                        <div class="about-stat-sub">Защита данных и операций</div>
+                    </div>
+                    <div class="about-stat-card">
+                        <div class="about-stat-icon" style="background:rgba(168,85,247,.1);color:#A855F7">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="about-stat-num">99.9%</div>
+                        <div class="about-stat-label">Uptime сервиса</div>
+                        <div class="about-stat-sub">Бесперебойная работа системы</div>
+                    </div>
+                </div>
+
+                <!-- Три ценности бренда -->
+                <div class="about-pillars">
+                    <div class="about-pillar">
+                        <div class="about-pillar-top">
+                            <div class="about-pillar-icon" style="background:rgba(34,197,94,.1)">
+                                <i class="fas fa-lock" style="color:#22C55E"></i>
+                            </div>
+                            <div class="about-pillar-badge" style="background:rgba(34,197,94,.1);color:#16A34A">Безопасность</div>
+                        </div>
+                        <h3>100% Защита средств</h3>
+                        <p>Каждая операция проходит многоуровневую криптографическую защиту. JWT-аутентификация, OTP-коды на каждую операцию, хэширование паролей не позволяет никому получить доступ к вашему аккаунту без вашего разрешения.</p>
+                        <ul class="about-pillar-list">
+                            <li><i class="fas fa-check"></i> OTP-подтверждение каждой операции</li>
+                            <li><i class="fas fa-check"></i> JWT-токены с автоматическим обновлением</li>
+                            <li><i class="fas fa-check"></i> Хэширование паролей bcrypt</li>
+                        </ul>
+                    </div>
+                    <div class="about-pillar">
+                        <div class="about-pillar-top">
+                            <div class="about-pillar-icon" style="background:rgba(59,130,246,.1)">
+                                <i class="fas fa-shield-check" style="color:#3B82F6"></i>
+                            </div>
+                            <div class="about-pillar-badge" style="background:rgba(59,130,246,.1);color:#2563EB">Надёжность</div>
+                        </div>
+                        <h3>Надёжная платформа</h3>
+                        <p>Защита от атак, ограничение на количество (rate limiting), транзакционная безопасность PostgreSQL без возможности двойного списания, без обмана пользователей ни по какой причине.</p>
+                        <ul class="about-pillar-list">
+                            <li><i class="fas fa-check"></i> Rate limiting на весь API</li>
+                            <li><i class="fas fa-check"></i> ACID-транзакции в БД</li>
+                            <li><i class="fas fa-check"></i> Защита от инъекций SQL</li>
+                        </ul>
+                    </div>
+                    <div class="about-pillar">
+                        <div class="about-pillar-top">
+                            <div class="about-pillar-icon" style="background:rgba(234,179,8,.1)">
+                                <i class="fas fa-microchip" style="color:#EAB308"></i>
+                            </div>
+                            <div class="about-pillar-badge" style="background:rgba(234,179,8,.1);color:#CA8A04">Производительность</div>
+                        </div>
+                        <h3>Скоростная инфраструктура</h3>
+                        <p>Оптимизированные запросы платформы, адаптированный дизайн интерфейса, мгновенное обновление состояния и форматирование на стороне клиента так, что работает с любого устройства.</p>
+                        <ul class="about-pillar-list">
+                            <li><i class="fas fa-check"></i> Оптимизированные запросы P2P</li>
+                            <li><i class="fas fa-check"></i> Gzip-сжатие всех ответов</li>
+                            <li><i class="fas fa-check"></i> Обновление состояния и рабочего баланса</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+            <footer class="site-footer">
+                <div class="footer-inner">
+                    <div class="footer-logo">
+                        <div class="sb-logo-icon sm"><i class="fas fa-coins"></i></div>
+                        <span>Banana <em>TX</em></span>
+                    </div>
+                    <div class="footer-links">
+                        <button onclick="switchPanel('terms')">Условия</button>
+                        <button onclick="switchPanel('contact')">Контакты</button>
+                        <button onclick="switchPanel('advantages')">Преимущества</button>
+                    </div>
+                    <div class="footer-copy">© 2025–2026 Banana Transaction. Все права защищены.</div>
+                </div>
+            </footer>
+        </div>
+
+        <!-- ============================================================
+             ПАНЕЛЬ: ГЕОГРАФИЯ
+        ============================================================ -->
+        <div class="d-panel info-panel" id="panel-geo">
+            <div class="info-wrap">
+                <div class="info-hero">
+                    <div class="info-tag">Охват</div>
+                    <h1 class="info-title">Глобальное <span>Присутствие</span></h1>
+                    <p class="info-sub">Работаем в 50+ странах — в Азии, Европе, Ближнем Востоке и России</p>
+                </div>
+
+                <div class="geo-grid">
+                    <div class="geo-region">
+                        <div class="geo-region-head">
+                            <i class="fas fa-flag" style="color:#EAB308"></i>
+                            <h3>СНГ</h3>
+                            <span class="geo-count">11 стран</span>
+                        </div>
+                        <div class="geo-countries">
+                            <span>🇷🇺 Россия</span><span>🇺🇦 Украина</span>
+                            <span>🇰🇿 Казахстан</span><span>🇧🇾 Беларусь</span>
+                            <span>🇺🇿 Узбекистан</span><span>🇦🇿 Азербайджан</span>
+                            <span>🇬🇪 Грузия</span><span>🇦🇲 Армения</span>
+                            <span>🇲🇩 Молдавия</span><span>🇰🇬 Кыргызстан</span>
+                            <span>🇹🇯 Таджикистан</span>
+                        </div>
+                    </div>
+
+                    <div class="geo-region">
+                        <div class="geo-region-head">
+                            <i class="fas fa-euro-sign" style="color:#3B82F6"></i>
+                            <h3>Европа</h3>
+                            <span class="geo-count">15 стран</span>
+                        </div>
+                        <div class="geo-countries">
+                            <span>🇩🇪 Германия</span><span>🇫🇷 Франция</span>
+                            <span>🇳🇱 Нидерланды</span><span>🇵🇱 Польша</span>
+                            <span>🇨🇿 Чехия</span><span>🇦🇹 Австрия</span>
+                            <span>🇧🇪 Бельгия</span><span>🇨🇭 Швейцария</span>
+                            <span>🇮🇹 Италия</span><span>🇪🇸 Испания</span>
+                            <span>🇸🇪 Швеция</span><span>🇳🇴 Норвегия</span>
+                            <span>🇫🇮 Финляндия</span><span>🇩🇰 Дания</span>
+                            <span>🇵🇹 Португалия</span>
+                        </div>
+                    </div>
+
+                    <div class="geo-region">
+                        <div class="geo-region-head">
+                            <i class="fas fa-moon" style="color:#F97316"></i>
+                            <h3>Ближний Восток</h3>
+                            <span class="geo-count">7 стран</span>
+                        </div>
+                        <div class="geo-countries">
+                            <span>🇦🇪 ОАЭ</span><span>🇸🇦 Саудия</span>
+                            <span>🇶🇦 Катар</span><span>🇰🇼 Кувейт</span>
+                            <span>🇧🇭 Бахрейн</span><span>🇴🇲 Оман</span>
+                            <span>🇮🇱 Израиль</span>
+                        </div>
+                    </div>
+
+                    <div class="geo-region">
+                        <div class="geo-region-head">
+                            <i class="fas fa-torii-gate" style="color:#A855F7"></i>
+                            <h3>Азия</h3>
+                            <span class="geo-count">8 стран</span>
+                        </div>
+                        <div class="geo-countries">
+                            <span>🇨🇳 Китай</span><span>🇯🇵 Япония</span>
+                            <span>🇸🇬 Сингапур</span><span>🇹🇭 Таиланд</span>
+                            <span>🇮🇳 Индия</span><span>🇻🇳 Вьетнам</span>
+                            <span>🇲🇾 Малайзия</span><span>🇮🇩 Индонезия</span>
+                        </div>
+                    </div>
+
+                    <div class="geo-region">
+                        <div class="geo-region-head">
+                            <i class="fas fa-flag-usa" style="color:#22C55E"></i>
+                            <h3>Америка</h3>
+                            <span class="geo-count">4 страны</span>
+                        </div>
+                        <div class="geo-countries">
+                            <span>🇺🇸 США</span><span>🇨🇦 Канада</span>
+                            <span>🇧🇷 Бразилия</span><span>🇲🇽 Мексика</span>
+                        </div>
+                    </div>
+
+                    <div class="geo-region geo-region-cta">
+                        <i class="fas fa-earth-americas geo-cta-icon"></i>
+                        <h3>Не нашли нужную страну?</h3>
+                        <p>Напишите нам и мы рассмотрим возможность расширения нашего присутствия</p>
+                        <button class="geo-cta-btn" onclick="switchPanel('contact')">
+                            Связаться с нами <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <footer class="site-footer">
+                <div class="footer-inner">
+                    <div class="footer-logo">
+                        <div class="sb-logo-icon sm"><i class="fas fa-coins"></i></div>
+                        <span>Banana <em>Transaction</em></span>
+                    </div>
+                    <div class="footer-links">
+                        <button onclick="switchPanel('terms')">Условия</button>
+                        <button onclick="switchPanel('contact')">Контакты</button>
+                        <button onclick="switchPanel('about')">О нас</button>
+                    </div>
+                    <div class="footer-copy">© 2025–2026 Banana Transaction. Все права защищены.</div>
+                </div>
+            </footer>
+        </div>
+
+        <!-- ============================================================
+             ПАНЕЛЬ: УСЛОВИЯ
+        ============================================================ -->
+        <div class="d-panel info-panel" id="panel-terms">
+            <div class="info-wrap">
+                <div class="info-hero">
+                    <div class="info-tag">Документация</div>
+                    <h1 class="info-title">Условия <span>использования</span></h1>
+                    <p class="info-sub">Последнее обновление: январь 2025 года</p>
+                </div>
+
+                <div class="terms-grid">
+                    <div class="terms-block">
+                        <div class="terms-block-head">
+                            <i class="fas fa-file-contract" style="color:#EAB308"></i>
+                            <h2>Пользовательское соглашение</h2>
+                        </div>
+                        <div class="terms-list">
+                            <div class="terms-item">
+                                <i class="fas fa-check"></i>
+                                <span>Для использования платформы необходимо быть не моложе 18 лет</span>
+                            </div>
+                            <div class="terms-item">
+                                <i class="fas fa-check"></i>
+                                <span>Одна регистрация на одного человека. Множественные аккаунты с одинаковыми данными запрещены</span>
+                            </div>
+                            <div class="terms-item">
+                                <i class="fas fa-check"></i>
+                                <span>Вы несёте ответственность за безопасность своего аккаунта и паролей</span>
+                            </div>
+                            <div class="terms-item">
+                                <i class="fas fa-check"></i>
+                                <span>Использование платформы в мошеннических или незаконных целях запрещено</span>
+                            </div>
+                            <div class="terms-item">
+                                <i class="fas fa-check"></i>
+                                <span>Не пытайтесь взломать или получить доступ к чужим данным любым способом</span>
+                            </div>
+                            <div class="terms-item">
+                                <i class="fas fa-check"></i>
+                                <span>Наш алгоритм мониторинга транзакций не позволит уйти от следящих правил</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="terms-block">
+                        <div class="terms-block-head">
+                            <i class="fas fa-user-shield" style="color:#3B82F6"></i>
+                            <h2>Условия конфиденциальности</h2>
+                        </div>
+                        <div class="terms-list">
+                            <div class="terms-item">
+                                <i class="fas fa-check"></i>
+                                <span>Мы храним минимальные данные: email, логин пользователя и история транзакций</span>
+                            </div>
+                            <div class="terms-item">
+                                <i class="fas fa-check"></i>
+                                <span>Ваши пароли никогда не хранятся в открытом виде и зашифрованы bcrypt</span>
+                            </div>
+                            <div class="terms-item">
+                                <i class="fas fa-check"></i>
+                                <span>Данные паролей в базе данных не хранятся и не могут быть восстановлены</span>
+                            </div>
+                            <div class="terms-item">
+                                <i class="fas fa-check"></i>
+                                <span>Все передачи данных защищены HTTPS-шифрованием</span>
+                            </div>
+                            <div class="terms-item">
+                                <i class="fas fa-check"></i>
+                                <span>Мы никогда не передаём персональные данные третьим лицам без согласия</span>
+                            </div>
+                            <div class="terms-item">
+                                <i class="fas fa-check"></i>
+                                <span>Данные транзакций хранятся 90 дней и удаляются по истечении срока</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="terms-block">
+                        <div class="terms-block-head">
+                            <i class="fas fa-coins" style="color:#22C55E"></i>
+                            <h2>Финансовые условия</h2>
+                        </div>
+                        <div class="terms-list">
+                            <div class="terms-item">
+                                <i class="fas fa-check"></i>
+                                <span>Минимальная сумма перевода: $0.01</span>
+                            </div>
+                            <div class="terms-item">
+                                <i class="fas fa-check"></i>
+                                <span>Комиссия платформы для зарегистрированных пользователей — без комиссии</span>
+                            </div>
+                            <div class="terms-item">
+                                <i class="fas fa-check"></i>
+                                <span>Балансы хранятся в USD с конвертацией для вывода по текущему курсу</span>
+                            </div>
+                            <div class="terms-item">
+                                <i class="fas fa-check"></i>
+                                <span>При возникновении споров обращайтесь в поддержку с деталями операции</span>
+                            </div>
+                            <div class="terms-item">
+                                <i class="fas fa-check"></i>
+                                <span>В случае технических сбоев средства зачисляются с задержкой до 24 часов</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="site-footer">
+                <div class="footer-inner">
+                    <div class="footer-logo">
+                        <div class="sb-logo-icon sm"><i class="fas fa-coins"></i></div>
+                        <span>Banana <em>TX</em></span>
+                    </div>
+                    <div class="footer-links">
+                        <button onclick="switchPanel('contact')">Контакт</button>
+                        <button onclick="switchPanel('about')">О нас</button>
+                        <button onclick="switchPanel('geo')">География</button>
+                    </div>
+                    <div class="footer-copy">© 2025–2026 Banana Transaction. Все права защищены.</div>
+                </div>
+            </footer>
+        </div>
+
+        <!-- ============================================================
+             ПАНЕЛЬ: КОНТАКТ
+        ============================================================ -->
+        <div class="d-panel info-panel" id="panel-contact">
+            <div class="info-wrap">
+                <div class="info-hero">
+                    <div class="info-tag">Поддержка</div>
+                    <h1 class="info-title">Связаться <span>с нами</span></h1>
+                    <p class="info-sub">Мы онлайн на связи и готовы помочь с любым вопросом</p>
+                </div>
+
+                <div class="contact-grid contact-grid-single">
+                    <a class="contact-card email" href="mailto:support@banana-tx.com">
+                        <div class="contact-card-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-card-info">
+                            <h3>Email</h3>
+                            <p>magometmaga0@gmail.com</p>
+                            <span class="contact-badge">до 24 часов</span>
+                        </div>
+                        <i class="fas fa-arrow-right contact-arrow"></i>
+                    </a>
+                </div>
+
+                <div class="contact-faq">
+                    <h2 class="faq-title">Частые вопросы</h2>
+                    <div class="faq-list">
+                        <details class="faq-item">
+                            <summary>Как быстро проходит денежный перевод?</summary>
+                            <p>Переводы между пользователями Banana TX обрабатываются мгновенно без задержек от 1 секунды.</p>
+                        </details>
+                        <details class="faq-item">
+                            <summary>Что делать при проблемах с выводом средств на карту?</summary>
+                            <p>Обратитесь в поддержку по email в течение 24 часов через Telegram или email. Мы отработаем ситуацию с индивидуальным подходом.</p>
+                        </details>
+                        <details class="faq-item">
+                            <summary>Как восстановить доступ к аккаунту?</summary>
+                            <p>На странице входа нажмите кнопку "Забыли пароль". Укажите email и мы пришлём ссылку для сброса пароля.</p>
+                        </details>
+                        <details class="faq-item">
+                            <summary>Можно ли отменить перевод?</summary>
+                            <p>Переводы между пользователями Banana TX выполняются мгновенно. Отменить их невозможно — всегда проверяйте получателя перед отправкой.</p>
+                        </details>
+                        <details class="faq-item">
+                            <summary>Как защитить свой аккаунт?</summary>
+                            <p>Мы используем JWT-токены, bcrypt-хэш паролей и OTP-коды каждой операции. Дополнительно рекомендуем надёжный уникальный пароль.</p>
+                        </details>
+                    </div>
+                </div>
+            </div>
+            <footer class="site-footer">
+                <div class="footer-inner">
+                    <div class="footer-logo">
+                        <div class="sb-logo-icon sm"><i class="fas fa-coins"></i></div>
+                        <span>Banana <em>Transaction</em></span>
+                    </div>
+                    <div class="footer-links">
+                        <button onclick="switchPanel('terms')">Условия</button>
+                        <button onclick="switchPanel('about')">О нас</button>
+                        <button onclick="switchPanel('advantages')">Преимущества</button>
+                    </div>
+                    <div class="footer-copy">© 2025–2026 Banana Transaction. Все права защищены.</div>
+                </div>
+            </footer>
+        </div>
+
+        <!-- ===== ПАНЕЛЬ: ТРЕЙДЕР (реквизиты) ===== -->
+        <!-- ===== ПАНЕЛЬ: РЕКВИЗИТЫ ТРЕЙДЕРА ===== -->
+        <div class="d-panel" id="panel-trader">
+            <div class="tr-page">
+
+                <!-- Заголовок страницы -->
+                <div class="tr-page-header">
+                    <div class="tr-page-title">
+                        <i class="fas fa-credit-card"></i> Реквизиты
+                    </div>
+                    <div class="tr-page-meta">
+                        <span class="tr-count-badge"><span id="tr-count">0</span> / 100</span>
+                        <button class="tr-add-btn" id="tr-add-btn" onclick="openAddMethod()">
+                            <i class="fas fa-plus"></i><span> Добавить</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KYC: верификация паспорта -->
+                <div class="tr-kyc" id="tr-kyc" style="display:none">
+
+                    <!-- Не подан -->
+                    <div class="tr-kyc-card" id="tr-kyc-none" style="display:none">
+                        <div class="tr-kyc-head">
+                            <i class="fas fa-id-card"></i>
+                            <div>
+                                <div class="tr-kyc-title">Верификация паспорта</div>
+                                <div class="tr-kyc-sub">Подтвердите личность, чтобы добавлять и включать реквизиты</div>
+                            </div>
+                        </div>
+                        <div class="tr-kyc-form">
+                            <div class="tr-field">
+                                <label class="tr-lbl">ФИО как в паспорте</label>
+                                <input class="tr-input" id="tr-kyc-name" placeholder="ИВАНОВ ИВАН ИВАНОВИЧ"
+                                       oninput="this.value=this.value.toUpperCase()">
+                            </div>
+                            <div class="tr-field">
+                                <label class="tr-lbl">Серия и номер паспорта</label>
+                                <input class="tr-input" id="tr-kyc-number" placeholder="0000 000000"
+                                       inputmode="numeric" maxlength="11" oninput="fmtPassportNum(this)">
+                            </div>
+                            <div class="tr-msg" id="tr-kyc-msg"></div>
+                            <button class="tr-submit-btn" onclick="submitPassport(this)">
+                                <i class="fas fa-paper-plane"></i> Отправить на проверку
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- На проверке -->
+                    <div class="tr-kyc-status tr-kyc-pending" id="tr-kyc-pending" style="display:none">
+                        <i class="fas fa-hourglass-half"></i>
+                        <div>
+                            <div class="tr-kyc-title">Паспорт на проверке</div>
+                            <div class="tr-kyc-sub" id="tr-kyc-pending-data">Реквизиты станут доступны после подтверждения администратором</div>
+                        </div>
+                    </div>
+
+                    <!-- Верифицирован -->
+                    <div class="tr-kyc-status tr-kyc-ok" id="tr-kyc-verified" style="display:none">
+                        <i class="fas fa-circle-check"></i>
+                        <div>
+                            <div class="tr-kyc-title">Личность подтверждена</div>
+                            <div class="tr-kyc-sub" id="tr-kyc-verified-data">Реквизиты автоматически переключаются при исчерпании лимита</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Список сохранённых реквизитов -->
+                <div class="tr-list" id="tr-list">
+                    <div class="tr-empty" id="tr-empty">
+                        <i class="fas fa-credit-card"></i>
+                        <p>Нет реквизитов</p>
+                        <span>Добавьте карту или телефон СБП для приёма платежей</span>
+                        <button class="tr-empty-btn" onclick="openAddMethod()">
+                            <i class="fas fa-plus"></i> Добавить первый реквизит
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Форма добавления -->
+                <div class="tr-form-wrap" id="tr-form-wrap" style="display:none">
+
+                    <!-- Шапка формы -->
+                    <div class="tr-form-head">
+                        <div class="tr-form-head-left">
+                            <div class="tr-form-head-icon"><i class="fas fa-plus"></i></div>
+                            <span>Новый реквизит</span>
+                        </div>
+                        <button class="tr-form-close" onclick="closeAddMethod()">
+                            <i class="fas fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <!-- Тип реквизита -->
+                    <div class="tr-type-tabs">
+                        <button class="tr-type-tab active" id="tab-card" onclick="setMethodType('card')">
+                            <i class="fas fa-credit-card"></i> Карта
+                        </button>
+                        <button class="tr-type-tab" id="tab-phone" onclick="setMethodType('phone')">
+                            <i class="fas fa-mobile-screen-button"></i> Телефон / СБП
+                        </button>
+                    </div>
+
+                    <!-- Двухколоночный layout: карта слева, форма справа -->
+                    <div class="tr-layout" id="tr-layout">
+
+                        <!-- Левая: превью карты / SBP -->
+                        <div class="tr-left" id="tr-left">
+
+                            <!-- SBP превью -->
+                            <div class="tr-sbp-scene" id="tr-sbp-scene" style="display:none">
+                                <div class="tr-sbp-card">
+                                    <div class="tr-sbp-glow"></div>
+                                    <div class="tr-sbp-top">
+                                        <div class="tr-sbp-brand">
+                                            <div class="tr-sbp-logo">СБП</div>
+                                            <div class="tr-sbp-brand-text">Система быстрых<br>платежей</div>
+                                        </div>
+                                        <div class="tr-sbp-dot"></div>
+                                    </div>
+                                    <div class="tr-sbp-phone-wrap">
+                                        <div class="tr-sbp-ph-label">Номер получателя</div>
+                                        <div class="tr-sbp-phone" id="tr-sbp-phone">+7 (___) ___-__-__</div>
+                                    </div>
+                                    <div class="tr-sbp-bottom">
+                                        <div class="tr-sbp-info-col">
+                                            <div class="tr-sbp-info-label">Получатель</div>
+                                            <div class="tr-sbp-info-val" id="tr-sbp-name">—</div>
+                                        </div>
+                                        <div class="tr-sbp-info-col tr-sbp-right">
+                                            <div class="tr-sbp-info-label">Банк</div>
+                                            <div class="tr-sbp-info-val" id="tr-sbp-bank-disp">—</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Карточный превью -->
+                            <div class="tr-card-scene" id="tr-card-scene">
+                                <div class="tr-card" id="tr-card">
+                                    <div class="tr-card-shine"></div>
+                                    <div class="tr-card-top">
+                                        <svg class="tr-chip" viewBox="0 0 50 38" fill="none">
+                                            <rect width="50" height="38" rx="5" fill="#D4AF37"/>
+                                            <rect y="13" width="50" height="12" fill="#C09B1A"/>
+                                            <rect x="17" width="16" height="38" fill="#C09B1A"/>
+                                            <rect x="17" y="13" width="16" height="12" fill="#B8891A"/>
+                                        </svg>
+                                        <div class="tr-card-logo" id="tr-mini-logo"></div>
+                                    </div>
+                                    <div class="tr-card-num" id="tr-mini-num">•••• •••• •••• ••••</div>
+                                    <div class="tr-card-bottom">
+                                        <div>
+                                            <div class="tr-card-lbl">ДЕРЖАТЕЛЬ КАРТЫ</div>
+                                            <div class="tr-card-name" id="tr-mini-holder">ВАШЕ ИМЯ</div>
+                                        </div>
+                                        <div style="text-align:right">
+                                            <div class="tr-card-lbl">СРОК ДЕЙСТВИЯ</div>
+                                            <div class="tr-card-exp" id="tr-mini-exp">ММ/ГГ</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!-- /tr-card-scene -->
+                        </div>
+
+                        <!-- Правая: поля формы -->
+                        <div class="tr-right">
+                            <div class="tr-form">
+
+                                <div class="tr-field">
+                                    <label class="tr-lbl" id="tr-lbl-num">Номер карты</label>
+                                    <input class="tr-input" id="tr-value"
+                                           placeholder="0000 0000 0000 0000"
+                                           inputmode="numeric" maxlength="19"
+                                           oninput="fmtMethodNum(this)">
+                                </div>
+
+                                <div class="tr-field" id="tr-field-holder">
+                                    <label class="tr-lbl" id="tr-lbl-holder">Держатель карты</label>
+                                    <input class="tr-input" id="tr-holder"
+                                           placeholder="IVAN IVANOV"
+                                           oninput="this.value=this.value.toUpperCase();trHolderInput()">
+                                </div>
+
+                                <div class="tr-field" id="tr-field-expiry">
+                                    <label class="tr-lbl">Срок действия</label>
+                                    <input class="tr-input" id="tr-expiry"
+                                           placeholder="ММ/ГГ" maxlength="5"
+                                           inputmode="numeric" oninput="fmtTrExpiry(this)">
+                                </div>
+
+                                <!-- Банк для СБП -->
+                                <div class="tr-field" id="tr-field-sbp-bank" style="display:none">
+                                    <label class="tr-lbl">Банк получателя</label>
+                                    <div class="tr-sbp-banks" id="tr-sbp-banks">
+
+                                        <button class="tr-sbp-bank-btn" onclick="selectSbpBank(this,'Сбер')">
+                                            <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" class="tr-sbp-svg">
+                                                <rect width="36" height="36" rx="9" fill="#21A038"/>
+                                                <path d="M26 12C23.6 9.5 19.8 8.4 16 9.6C11.2 11.1 8.6 16.2 10.2 21.2C11.7 25.8 16.8 28.6 21.8 27.3L24.5 25.2C24.5 25.2 18.5 27 15 22.5C11.8 18.4 13.8 12.5 18.6 11.2C21 10.5 23.8 11.2 25.4 12.9Z" fill="white"/>
+                                                <path d="M26 12L28.4 15.2C28.4 15.2 29.8 20.5 26.2 25L24.5 25.2C24.5 25.2 28 22 26.8 17.5C26 14.2 23.8 12.2 23.8 12.2Z" fill="rgba(255,255,255,.4)"/>
+                                            </svg>
+                                            <span>Сбер</span>
+                                        </button>
+
+                                        <button class="tr-sbp-bank-btn" onclick="selectSbpBank(this,'Тинькофф')">
+                                            <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" class="tr-sbp-svg">
+                                                <rect width="36" height="36" rx="9" fill="#FFDD2D"/>
+                                                <rect x="8" y="9" width="20" height="4.5" rx="2.2" fill="#1C1C1E"/>
+                                                <rect x="14" y="9" width="8" height="19" rx="2.2" fill="#1C1C1E"/>
+                                            </svg>
+                                            <span>Тинькофф</span>
+                                        </button>
+
+                                        <button class="tr-sbp-bank-btn" onclick="selectSbpBank(this,'ВТБ')">
+                                            <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" class="tr-sbp-svg">
+                                                <rect width="36" height="36" rx="9" fill="#009FDF"/>
+                                                <path d="M8 11h4.5l2.5 9.5 2.5-9.5H22v1.5h-2L17 24.5h-3L11 12.5H9V11ZM22 11h10v1.5h-4v12H26v-12h-4V11Z" fill="white"/>
+                                            </svg>
+                                            <span>ВТБ</span>
+                                        </button>
+
+                                        <button class="tr-sbp-bank-btn" onclick="selectSbpBank(this,'Альфа')">
+                                            <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" class="tr-sbp-svg">
+                                                <rect width="36" height="36" rx="9" fill="#EF3124"/>
+                                                <path d="M18 8L10 28h3.5l2-5h9l2 5H30L22 8h-4Zm-1.5 12l3.5-9 3.5 9h-7Z" fill="white"/>
+                                            </svg>
+                                            <span>Альфа</span>
+                                        </button>
+
+                                        <button class="tr-sbp-bank-btn" onclick="selectSbpBank(this,'Газпром')">
+                                            <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" class="tr-sbp-svg">
+                                                <rect width="36" height="36" rx="9" fill="#003E8C"/>
+                                                <path d="M18 7c-6.075 0-11 4.925-11 11s4.925 11 11 11 11-4.925 11-11S24.075 7 18 7Zm0 18c-3.866 0-7-3.134-7-7s3.134-7 7-7 7 3.134 7 7-3.134 7-7 7Z" fill="white"/>
+                                                <path d="M18 15v3h4v2h-4v3" stroke="white" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+                                            </svg>
+                                            <span>Газпром</span>
+                                        </button>
+
+                                        <button class="tr-sbp-bank-btn" onclick="selectSbpBank(this,'Озон')">
+                                            <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" class="tr-sbp-svg">
+                                                <rect width="36" height="36" rx="9" fill="#005BFF"/>
+                                                <text x="18" y="21" text-anchor="middle" fill="white" font-size="9.5" font-weight="900" font-family="Arial,sans-serif" letter-spacing="0.5">OZON</text>
+                                                <rect x="9" y="23" width="18" height="2.5" rx="1.25" fill="white" opacity=".45"/>
+                                            </svg>
+                                            <span>Озон</span>
+                                        </button>
+
+                                        <button class="tr-sbp-bank-btn" onclick="selectSbpBank(this,'Райффайзен')">
+                                            <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" class="tr-sbp-svg">
+                                                <rect width="36" height="36" rx="9" fill="#FFE600"/>
+                                                <polygon points="18,6 10,15 13.5,15 13.5,30 22.5,30 22.5,15 26,15" fill="#1C1C1E"/>
+                                            </svg>
+                                            <span>Райфф</span>
+                                        </button>
+
+                                        <button class="tr-sbp-bank-btn" onclick="selectSbpBank(this,'МТС')">
+                                            <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" class="tr-sbp-svg">
+                                                <rect width="36" height="36" rx="9" fill="#E30611"/>
+                                                <ellipse cx="18" cy="18" rx="10" ry="8.5" fill="white"/>
+                                                <text x="18" y="21" text-anchor="middle" fill="#E30611" font-size="8" font-weight="900" font-family="Arial,sans-serif">МТС</text>
+                                            </svg>
+                                            <span>МТС</span>
+                                        </button>
+
+                                        <button class="tr-sbp-bank-btn" onclick="selectSbpBank(this,'Почта')">
+                                            <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" class="tr-sbp-svg">
+                                                <rect width="36" height="36" rx="9" fill="#3570B3"/>
+                                                <rect x="7" y="12" width="22" height="14" rx="2" fill="white"/>
+                                                <polyline points="7,12 18,21 29,12" fill="none" stroke="#3570B3" stroke-width="2.5" stroke-linejoin="round"/>
+                                            </svg>
+                                            <span>Почта</span>
+                                        </button>
+
+                                    </div>
+                                    <input type="hidden" id="tr-sbp-bank">
+                                </div>
+
+                                <div class="tr-field" id="tr-field-bank">
+                                    <label class="tr-lbl">Банк</label>
+                                    <div class="tr-bank-auto" id="tr-bank-auto">
+                                        <i class="fas fa-university"></i>
+                                        <span id="tr-bank-auto-name">Введите номер карты</span>
+                                        <span class="tr-bank-auto-badge" id="tr-bank-auto-badge" style="display:none">авто</span>
+                                    </div>
+                                    <input type="hidden" id="tr-bank">
+                                </div>
+
+                                <div class="tr-msg" id="tr-form-msg"></div>
+
+                                <button class="tr-submit-btn" onclick="submitMethod(this)">
+                                    <i class="fas fa-plus"></i> Добавить реквизит
+                                </button>
+
+                            </div>
+                        </div>
+
+                    </div><!-- /tr-layout -->
+                </div><!-- /tr-form-wrap -->
+
+            </div>
+        </div>
+
+        <!-- ===== ПАНЕЛЬ: РЕКВИЗИТЫ ===== -->
+        <div class="d-panel info-panel" id="panel-card">
+            <div class="cp-page">
+
+                <div class="cp-page-title">
+                    <i class="fas fa-credit-card"></i> Мои реквизиты
+                </div>
+
+                <div class="cp-layout">
+
+                    <!-- Левая колонка: превью карты -->
+                    <div class="cp-left">
+                        <div class="cp-card-scene">
+                            <div class="cp-card empty" id="cp-card">
+                                <div class="cp-card-shine"></div>
+                                <div class="cp-card-top">
+                                    <svg class="cp-chip" viewBox="0 0 50 38" fill="none">
+                                        <rect width="50" height="38" rx="5" fill="#D4AF37"/>
+                                        <rect y="13" width="50" height="12" fill="#C09B1A"/>
+                                        <rect x="17" width="16" height="38" fill="#C09B1A"/>
+                                        <rect x="17" y="13" width="16" height="12" fill="#B8891A"/>
+                                    </svg>
+                                    <div class="cp-card-logo" id="cp-logo"></div>
+                                </div>
+                                <div class="cp-card-num" id="cp-num">•••• •••• •••• ••••</div>
+                                <div class="cp-card-bottom">
+                                    <div class="cp-card-info">
+                                        <div class="cp-card-lbl">ДЕРЖАТЕЛЬ КАРТЫ</div>
+                                        <div class="cp-card-name" id="cp-name"></div>
+                                    </div>
+                                    <div class="cp-card-info cp-right-align">
+                                        <div class="cp-card-lbl">СРОК ДЕЙСТВИЯ</div>
+                                        <div class="cp-card-exp" id="cp-exp"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cp-card-hint">
+                            <i class="fas fa-shield-halved"></i> Данные хранятся только на вашем устройстве
+                        </div>
+                    </div>
+
+                    <!-- Правая колонка: форма -->
+                    <div class="cp-right">
+                        <div class="cp-form">
+
+                            <div class="cp-field">
+                                <label class="cp-lbl">Номер карты</label>
+                                <input type="text" class="cp-input" id="cp-number"
+                                       placeholder="0000 0000 0000 0000" maxlength="19"
+                                       inputmode="numeric" oninput="fmtCardNum(this);updateCard()">
+                                <div id="cp-detected" class="cp-detected"></div>
+                            </div>
+
+                            <div class="cp-field">
+                                <label class="cp-lbl">Держатель карты</label>
+                                <input type="text" class="cp-input" id="cp-holder"
+                                       placeholder="IVAN IVANOV" maxlength="26"
+                                       oninput="this.value=this.value.toUpperCase();updateCard()">
+                            </div>
+
+                            <div class="cp-field-row">
+                                <div class="cp-field">
+                                    <label class="cp-lbl">Срок действия</label>
+                                    <input type="text" class="cp-input" id="cp-expiry"
+                                           placeholder="ММ/ГГ" maxlength="5"
+                                           inputmode="numeric" oninput="fmtExpiry(this);updateCard()">
+                                </div>
+                                <div class="cp-field">
+                                    <label class="cp-lbl">CVV / CVC</label>
+                                    <input type="password" class="cp-input" id="cp-cvv"
+                                           placeholder="•••" maxlength="4" inputmode="numeric">
+                                </div>
+                            </div>
+
+                            <div class="cp-msg" id="cp-msg"></div>
+
+                            <div class="cp-btns">
+                                <button class="cp-save-btn" onclick="saveCard()">
+                                    <i class="fas fa-floppy-disk"></i> Сохранить карту
+                                </button>
+                                <button class="cp-clear-btn" onclick="clearCard()">
+                                    <i class="fas fa-rotate-left"></i> Сбросить
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /main-area -->
+</div><!-- /app-shell -->
+
+<!-- ===== МОДАЛКИ ===== -->
+
+<div class="modal-overlay" id="modal-transfer">
+    <div class="modal-box transfer-box" onclick="event.stopPropagation()">
+        <div class="modal-head">
+            <div class="modal-head-icon yellow"><i class="fas fa-paper-plane"></i></div>
+            <div class="modal-head-text">
+                <div class="modal-head-title">Новый перевод</div>
+                <div class="modal-head-sub">P2P перевод с мгновенным зачислением на счёт</div>
+            </div>
+            <button class="modal-close" onclick="closeModal('transfer')"><i class="fas fa-xmark"></i></button>
+        </div>
+        <div class="modal-body transfer-body">
+            <div class="tf-balance-row">
+                <span class="tf-balance-label">Доступно:</span>
+                <span class="tf-balance-val" id="transfer-avail">$0.00</span>
+            </div>
+            <div class="sf-group">
+                <label class="sf-label">Получатель</label>
+                <div class="sf-input-wrap">
+                    <i class="fas fa-at sf-icon"></i>
+                    <input id="send-to" class="sf-input" placeholder="email или @логин пользователя" autocomplete="off" oninput="debounceFind()">
+                </div>
+                <div id="recipient-preview"></div>
+            </div>
+            <div class="sf-group">
+                <label class="sf-label">Сумма (USD)</label>
+                <div class="tf-amount-wrap">
+                    <span class="tf-currency">$</span>
+                    <input id="send-amount" class="tf-amount-input" type="number" min="0.01" step="0.01" placeholder="0.00">
+                </div>
+                <div class="tf-quick-row">
+                    <button onclick="document.getElementById('send-amount').value=10">$10</button>
+                    <button onclick="document.getElementById('send-amount').value=50">$50</button>
+                    <button onclick="document.getElementById('send-amount').value=100">$100</button>
+                    <button onclick="document.getElementById('send-amount').value=500">$500</button>
+                </div>
+            </div>
+            <div class="sf-group">
+                <label class="sf-label">Комментарий <em>необязательно</em></label>
+                <div class="sf-input-wrap">
+                    <i class="fas fa-comment-dots sf-icon"></i>
+                    <input id="send-note" class="sf-input" placeholder="За что переводите?">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-cancel" onclick="closeModal('transfer')">Отмена</button>
+            <button class="tf-submit-btn" id="send-btn" onclick="initiateTransfer()">
+                <i class="fas fa-paper-plane"></i> Перевести
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-deposit">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-head">
+            <div class="modal-head-icon green"><i class="fas fa-plus"></i></div>
+            <div class="modal-head-text">
+                <div class="modal-head-title">Пополнить баланс</div>
+                <div class="modal-head-sub">Зачисление на основной счёт</div>
+            </div>
+            <button class="modal-close" onclick="closeModal('deposit')"><i class="fas fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <label class="modal-label">Укажите сумму (USD)</label>
+            <div class="modal-amount-wrap">
+                <span class="modal-currency">$</span>
+                <input id="deposit-amount" class="modal-amount-input" type="number" min="1" step="0.01" placeholder="0.00" autofocus>
+            </div>
+            <div class="quick-btns">
+                <button onclick="setAmt('deposit-amount',10)">$10</button>
+                <button onclick="setAmt('deposit-amount',50)">$50</button>
+                <button onclick="setAmt('deposit-amount',100)">$100</button>
+                <button onclick="setAmt('deposit-amount',500)">$500</button>
+                <button onclick="setAmt('deposit-amount',1000)">$1 000</button>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="modal-msg" id="deposit-msg"></div>
+            <button class="modal-action-btn green-action" id="deposit-btn" onclick="doDeposit()">
+                <i class="fas fa-check"></i> Пополнить
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-withdraw">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-head">
+            <div class="modal-head-icon orange"><i class="fas fa-arrow-up"></i></div>
+            <div class="modal-head-text">
+                <div class="modal-head-title">Вывод средств</div>
+                <div class="modal-head-sub">Заявка на вывод</div>
+            </div>
+            <button class="modal-close" onclick="closeModal('withdraw')"><i class="fas fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <label class="modal-label">Укажите сумму (USD)</label>
+            <div class="modal-amount-wrap">
+                <span class="modal-currency">$</span>
+                <input id="withdraw-amount" class="modal-amount-input" type="number" min="1" step="0.01" placeholder="0.00">
+            </div>
+            <div class="quick-btns">
+                <button onclick="setAmt('withdraw-amount',10)">$10</button>
+                <button onclick="setAmt('withdraw-amount',50)">$50</button>
+                <button onclick="setAmt('withdraw-amount',100)">$100</button>
+            </div>
+            <div class="avail-row">Доступно: <strong id="withdraw-avail">$0.00</strong></div>
+        </div>
+        <div class="modal-footer">
+            <div class="modal-msg" id="withdraw-msg"></div>
+            <button class="modal-action-btn orange-action" id="withdraw-btn" onclick="doWithdraw()">
+                <i class="fas fa-arrow-right"></i> Вывести
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-confirm">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-head">
+            <div class="modal-head-icon yellow"><i class="fas fa-paper-plane"></i></div>
+            <div class="modal-head-text">
+                <div class="modal-head-title">Подтверждение перевода</div>
+                <div class="modal-head-sub">Проверьте детали перед отправкой</div>
+            </div>
+            <button class="modal-close" onclick="closeModal('confirm')"><i class="fas fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="confirm-flow">
+                <div class="confirm-party">
+                    <div class="confirm-avatar" id="cf-sender-av"></div>
+                    <div class="confirm-pname" id="cf-sender-name"></div>
+                    <div class="confirm-prole">Отправитель</div>
+                </div>
+                <div class="confirm-middle">
+                    <div class="confirm-transfer-amount" id="cf-amount"></div>
+                    <div class="confirm-arrow-line">
+                        <div class="confirm-line"></div>
+                        <i class="fas fa-caret-right"></i>
+                    </div>
+                </div>
+                <div class="confirm-party">
+                    <div class="confirm-avatar" id="cf-receiver-av"></div>
+                    <div class="confirm-pname" id="cf-receiver-name"></div>
+                    <div class="confirm-prole">Получатель</div>
+                </div>
+            </div>
+            <div class="confirm-note" id="cf-note-row" style="display:none">
+                <i class="fas fa-comment-dots"></i>
+                <span id="cf-note"></span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="modal-msg" id="confirm-msg"></div>
+            <div style="display:flex;gap:10px;margin-left:auto">
+                <button class="modal-cancel" onclick="closeModal('confirm')">Отмена</button>
+                <button class="modal-action-btn yellow-action" id="confirm-btn" onclick="doTransfer()">
+                    <i class="fas fa-check"></i> Отправить
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-success">
+    <div class="modal-box success-modal" onclick="event.stopPropagation()">
+        <div class="success-rings">
+            <div class="ring ring-1"></div>
+            <div class="ring ring-2"></div>
+            <div class="ring ring-3"></div>
+        </div>
+        <div class="success-check"><i class="fas fa-check"></i></div>
+        <div class="success-title" id="success-title">Готово!</div>
+        <div class="success-sub" id="success-sub"></div>
+        <button class="modal-action-btn green-action" onclick="closeModal('success')" style="margin:0 auto">
+            Закрыть!
+        </button>
+    </div>
+</div>
+
+
+
+<script src="js/dashboard.js?v=34"></script>
+<script>
+(function(){
+    document.addEventListener('contextmenu',function(e){e.preventDefault();});
+    document.addEventListener('keydown',function(e){
+        if(e.key==='F12'){e.preventDefault();return false;}
+        if(e.ctrlKey&&e.shiftKey&&['I','J','C'].includes(e.key)){e.preventDefault();return false;}
+        if(e.ctrlKey&&['u','U'].includes(e.key)){e.preventDefault();return false;}
+    });
+    setInterval(function(){
+        var isMobile=window.outerWidth<=768;
+        if(!isMobile&&window.outerWidth-window.innerWidth>200){
+            document.body.style.filter='blur(20px)';document.body.style.pointerEvents='none';
+        }else{document.body.style.filter='';document.body.style.pointerEvents='';}
+    },1000);
+})();
+</script>
+</body>
+</html>
