@@ -362,7 +362,12 @@ let adminKey = sessionStorage.getItem('adminKey') || '';
 function adminFetch(url, opts = {}) {
     return fetch(url, {
         ...opts,
-        headers: { ...(opts.headers || {}), 'x-admin-key': adminKey, 'ngrok-skip-browser-warning': '1' },
+        headers: {
+            ...(opts.body ? { 'Content-Type': 'application/json' } : {}),
+            ...(opts.headers || {}),
+            'x-admin-key': adminKey,
+            'ngrok-skip-browser-warning': '1',
+        },
     });
 }
 
