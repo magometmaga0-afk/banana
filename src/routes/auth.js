@@ -5,6 +5,7 @@ const jwt       = require('jsonwebtoken');
 const crypto    = require('crypto');
 const http      = require('http');
 const https     = require('https');
+const multer    = require('multer');
 const { pool, logActivity } = require('../db');
 const { sendOtpEmail }      = require('../mailer');
 const { requireAuth, invalidateSession, invalidateUserSessions } = require('../middleware/auth');
@@ -445,11 +446,19 @@ router.post('/change-username', requireAuth, async (req, res) => {
     }
 });
 
+const passportUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 8 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => {
+        cb(null, ['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype));
+    },
+});
+
 // GET /api/auth/passport — статус верификации трейдера
 router.get('/passport', requireAuth, async (req, res) => {
     try {
         const { rows } = await pool.query(
-            `SELECT passport_full_name, passport_number, passport_submitted_at, verified
+            `SELECT (passport_image IS NOT NULL) AS has_image, passport_submitted_at, verified
              FROM users WHERE id=$1`,
             [req.user.id]
         );
@@ -457,10 +466,9 @@ router.get('/passport', requireAuth, async (req, res) => {
         const u = rows[0];
         res.json({
             success: true,
-            full_name:     u.passport_full_name,
-            number:        u.passport_number,
-            submitted_at:  u.passport_submitted_at,
-            verified:      u.verified,
+            has_image:    u.has_image,
+            submitted_at: u.passport_submitted_at,
+            verified:     u.verified,
             status: !u.passport_submitted_at ? 'none' : u.verified ? 'verified' : 'pending',
         });
     } catch (err) {
@@ -469,32 +477,47 @@ router.get('/passport', requireAuth, async (req, res) => {
     }
 });
 
-// POST /api/auth/passport — подать паспортные данные на верификацию
-router.post('/passport', requireAuth, async (req, res) => {
-    const fullName = (req.body.full_name || '').trim().replace(/\s+/g, ' ');
-    const number   = (req.body.number    || '').replace(/\D/g, '');
-
-    if (validate(res, [
-        [fullName.length < 5 || fullName.length > 150, 'Введите ФИО как в паспорте'],
-        [!/^[a-zA-Zа-яА-ЯёЁ\-\s]+$/.test(fullName),     'ФИО может содержать только буквы'],
-        [number.length !== 10,                           'Серия и номер паспорта — 10 цифр'],
-    ])) return;
-
+// GET /api/auth/passport/image — своё фото паспорта (посмотреть, что отправил)
+router.get('/passport/image', requireAuth, async (req, res) => {
     try {
-        // Повторная подача сбрасывает верификацию — админ должен проверить заново
-        await pool.query(
-            `UPDATE users SET passport_full_name=$1, passport_number=$2,
-                              passport_submitted_at=NOW(), verified=false
-             WHERE id=$3`,
-            [fullName.toUpperCase(), number, req.user.id]
+        const { rows } = await pool.query(
+            'SELECT passport_image, passport_image_mime FROM users WHERE id=$1',
+            [req.user.id]
         );
-        await logActivity(req.user.email, 'passport_submit', 'success', req.ip);
-        console.log(`🛂 Паспорт подан на проверку: ${req.user.username}`);
-        res.json({ success: true, status: 'pending' });
+        if (!rows.length || !rows[0].passport_image) return res.status(404).end();
+        res.set('Content-Type', rows[0].passport_image_mime || 'image/jpeg');
+        res.set('Cache-Control', 'private, no-store');
+        res.send(rows[0].passport_image);
     } catch (err) {
-        console.error('auth/passport POST:', err.message);
-        res.status(500).json({ success: false, error: 'Ошибка сервера' });
+        console.error('auth/passport/image:', err.message);
+        res.status(500).end();
     }
+});
+
+// POST /api/auth/passport — загрузить фото/скан паспорта на верификацию
+router.post('/passport', requireAuth, (req, res) => {
+    passportUpload.single('photo')(req, res, async (err) => {
+        if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE')
+            return res.json({ success: false, error: 'Файл слишком большой (макс. 8 МБ)' });
+        if (err) return res.json({ success: false, error: 'Ошибка загрузки файла' });
+        if (!req.file) return res.json({ success: false, error: 'Загрузите фото паспорта (JPEG, PNG или WebP)' });
+
+        try {
+            // Повторная подача сбрасывает верификацию — админ должен проверить заново
+            await pool.query(
+                `UPDATE users SET passport_image=$1, passport_image_mime=$2,
+                                  passport_submitted_at=NOW(), verified=false
+                 WHERE id=$3`,
+                [req.file.buffer, req.file.mimetype, req.user.id]
+            );
+            await logActivity(req.user.email, 'passport_submit', 'success', req.ip);
+            console.log(`🛂 Паспорт подан на проверку: ${req.user.username}`);
+            res.json({ success: true, status: 'pending' });
+        } catch (err2) {
+            console.error('auth/passport POST:', err2.message);
+            res.status(500).json({ success: false, error: 'Ошибка сервера' });
+        }
+    });
 });
 
 // POST /api/auth/send-email-code — отправить код на текущую почту

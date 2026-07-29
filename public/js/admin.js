@@ -73,9 +73,8 @@ function renderPassportBlock(u) {
 
     return `<div class="modal-passport">
         <div class="modal-passport-row"><span>Статус</span><span>${status}</span></div>
-        <div class="modal-passport-row"><span>ФИО</span><span>${escapeHtml(u.passport_full_name || '—')}</span></div>
-        <div class="modal-passport-row"><span>Серия и номер</span><span>${escapeHtml(u.passport_number || '—')}</span></div>
         <div class="modal-passport-row"><span>Подан</span><span>${fmtDate(u.passport_submitted_at)}</span></div>
+        <img class="modal-passport-img" id="modal-passport-img" alt="Фото паспорта">
         ${!u.verified ? `
         <div class="modal-passport-actions">
             <button class="btn-action btn-unban" onclick="verifyUser(${u.id}, true); closeModal()"><i class="fas fa-check"></i> Одобрить</button>
@@ -84,9 +83,19 @@ function renderPassportBlock(u) {
     </div>`;
 }
 
+async function loadPassportImage(userId) {
+    const img = document.getElementById('modal-passport-img');
+    if (!img) return;
+    try {
+        const res = await adminFetch(`/api/admin/users/${userId}/passport-image`);
+        if (!res.ok) return;
+        img.src = URL.createObjectURL(await res.blob());
+    } catch(e) { console.error('loadPassportImage:', e); }
+}
+
 function kycBadge(u) {
-    if (u.verified)                 return `<span class="badge badge-success" title="${escapeHtml(u.passport_full_name || '')} · ${escapeHtml(u.passport_number || '')}"><i class="fas fa-id-card"></i> Паспорт ✓</span>`;
-    if (u.passport_submitted_at)    return `<span class="badge badge-orange" title="${escapeHtml(u.passport_full_name || '')} · ${escapeHtml(u.passport_number || '')}"><i class="fas fa-hourglass-half"></i> На проверке</span>`;
+    if (u.verified)              return `<span class="badge badge-success"><i class="fas fa-id-card"></i> Паспорт ✓</span>`;
+    if (u.passport_submitted_at) return `<span class="badge badge-orange"><i class="fas fa-hourglass-half"></i> На проверке</span>`;
     return '';
 }
 
@@ -316,6 +325,7 @@ function openModal(userId) {
     document.getElementById('modal-email').textContent    = user.email;
 
     document.getElementById('modal-passport').innerHTML = renderPassportBlock(user);
+    if (user.passport_submitted_at) loadPassportImage(user.id);
 
     const logs = allLogs.filter(l => l.user_id === userId);
     const tbody = document.getElementById('modal-tbody');

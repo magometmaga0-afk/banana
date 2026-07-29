@@ -7,8 +7,7 @@ router.use(requireAdmin);
 router.get('/dashboard', async (req, res) => {
     try {
         const [users, logs, stats, transactions] = await Promise.all([
-            pool.query(`SELECT id, username, email, created_at, banned, banned_at, role, verified,
-                               passport_full_name, passport_number, passport_submitted_at
+            pool.query(`SELECT id, username, email, created_at, banned, banned_at, role, verified, passport_submitted_at
                         FROM users ORDER BY created_at DESC`),
             pool.query('SELECT id, user_id, email, action, status, ip, details, created_at FROM activity_logs ORDER BY created_at DESC LIMIT 500'),
             pool.query(`
@@ -118,6 +117,24 @@ router.post('/users/:id/verify', async (req, res) => {
     } catch (err) {
         console.error('admin/verify:', err.message);
         res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
+router.get('/users/:id/passport-image', async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (!id) return res.status(400).end();
+    try {
+        const { rows } = await pool.query(
+            'SELECT passport_image, passport_image_mime FROM users WHERE id=$1',
+            [id]
+        );
+        if (!rows.length || !rows[0].passport_image) return res.status(404).end();
+        res.set('Content-Type', rows[0].passport_image_mime || 'image/jpeg');
+        res.set('Cache-Control', 'private, no-store');
+        res.send(rows[0].passport_image);
+    } catch (err) {
+        console.error('admin/passport-image:', err.message);
+        res.status(500).end();
     }
 });
 

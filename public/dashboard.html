@@ -990,18 +990,17 @@
                             </div>
                         </div>
                         <div class="tr-kyc-form">
-                            <div class="tr-field">
-                                <label class="tr-lbl">ФИО как в паспорте</label>
-                                <input class="tr-input" id="tr-kyc-name" placeholder="ИВАНОВ ИВАН ИВАНОВИЧ"
-                                       oninput="this.value=this.value.toUpperCase()">
-                            </div>
-                            <div class="tr-field">
-                                <label class="tr-lbl">Серия и номер паспорта</label>
-                                <input class="tr-input" id="tr-kyc-number" placeholder="0000 000000"
-                                       inputmode="numeric" maxlength="11" oninput="fmtPassportNum(this)">
+                            <input type="file" id="tr-kyc-file" accept="image/jpeg,image/png,image/webp" capture="environment" hidden onchange="onPassportFileChosen(this)">
+                            <div class="tr-kyc-drop" id="tr-kyc-drop" onclick="document.getElementById('tr-kyc-file').click()">
+                                <img id="tr-kyc-preview" style="display:none">
+                                <div id="tr-kyc-drop-empty">
+                                    <i class="fas fa-camera"></i>
+                                    <div>Сфотографируйте или загрузите разворот паспорта</div>
+                                    <span>JPEG, PNG или WebP, до 8 МБ</span>
+                                </div>
                             </div>
                             <div class="tr-msg" id="tr-kyc-msg"></div>
-                            <button class="tr-submit-btn" onclick="submitPassport(this)">
+                            <button class="tr-submit-btn" id="tr-kyc-submit-btn" onclick="submitPassport(this)" disabled>
                                 <i class="fas fa-paper-plane"></i> Отправить на проверку
                             </button>
                         </div>
@@ -1009,19 +1008,19 @@
 
                     <!-- На проверке -->
                     <div class="tr-kyc-status tr-kyc-pending" id="tr-kyc-pending" style="display:none">
-                        <i class="fas fa-hourglass-half"></i>
+                        <img class="tr-kyc-thumb" id="tr-kyc-pending-thumb">
                         <div>
-                            <div class="tr-kyc-title">Паспорт на проверке</div>
-                            <div class="tr-kyc-sub" id="tr-kyc-pending-data">Реквизиты станут доступны после подтверждения администратором</div>
+                            <div class="tr-kyc-title"><i class="fas fa-hourglass-half"></i> Паспорт на проверке</div>
+                            <div class="tr-kyc-sub">Реквизиты станут доступны после подтверждения администратором</div>
                         </div>
                     </div>
 
                     <!-- Верифицирован -->
                     <div class="tr-kyc-status tr-kyc-ok" id="tr-kyc-verified" style="display:none">
-                        <i class="fas fa-circle-check"></i>
+                        <img class="tr-kyc-thumb" id="tr-kyc-verified-thumb">
                         <div>
-                            <div class="tr-kyc-title">Личность подтверждена</div>
-                            <div class="tr-kyc-sub" id="tr-kyc-verified-data">Реквизиты автоматически переключаются при исчерпании лимита</div>
+                            <div class="tr-kyc-title"><i class="fas fa-circle-check"></i> Личность подтверждена</div>
+                            <div class="tr-kyc-sub">Реквизиты автоматически переключаются при исчерпании лимита</div>
                         </div>
                     </div>
 

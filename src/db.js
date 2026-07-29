@@ -37,10 +37,12 @@ async function initDB() {
         ALTER TABLE users ADD COLUMN IF NOT EXISTS banned_at TIMESTAMPTZ DEFAULT NULL;
         ALTER TABLE users ADD COLUMN IF NOT EXISTS role      VARCHAR(20)  DEFAULT 'trader';
         ALTER TABLE users ADD COLUMN IF NOT EXISTS verified  BOOLEAN      DEFAULT false;
-        -- KYC: паспортные данные трейдера, обязательны для управления реквизитами
-        ALTER TABLE users ADD COLUMN IF NOT EXISTS passport_full_name    VARCHAR(150);
-        ALTER TABLE users ADD COLUMN IF NOT EXISTS passport_number       VARCHAR(20);
+        -- KYC: фото/скан паспорта трейдера, обязательны для управления реквизитами
+        ALTER TABLE users DROP COLUMN IF EXISTS passport_full_name;
+        ALTER TABLE users DROP COLUMN IF EXISTS passport_number;
         ALTER TABLE users ADD COLUMN IF NOT EXISTS passport_submitted_at TIMESTAMPTZ;
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS passport_image        BYTEA;
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS passport_image_mime   VARCHAR(30);
         CREATE TABLE IF NOT EXISTS wallets (
             id         SERIAL PRIMARY KEY,
             user_id    INTEGER UNIQUE REFERENCES users(id) ON DELETE CASCADE,

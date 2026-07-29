@@ -1158,8 +1158,15 @@ async function loadTraderMethods() {
     } catch(e) { console.error('loadTraderMethods:', e); }
 }
 
-function fmtPassportDisp(number) {
-    return number && number.length === 10 ? number.slice(0,4) + ' ' + number.slice(4) : (number || '');
+let _trPassportFile = null;
+
+async function loadAuthedImage(url, imgEl) {
+    if (!imgEl) return;
+    try {
+        const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}`, 'ngrok-skip-browser-warning': '1' } });
+        if (!res.ok) return;
+        imgEl.src = URL.createObjectURL(await res.blob());
+    } catch(e) { console.error('loadAuthedImage:', e); }
 }
 
 async function loadPassportStatus() {
@@ -1179,34 +1186,59 @@ async function loadPassportStatus() {
         elOk.style.display      = data.status === 'verified' ? '' : 'none';
         if (addBtn) addBtn.disabled = !_trVerified;
 
-        const submittedLine = `${data.full_name || ''} · ${fmtPassportDisp(data.number)}`;
-        const pendingData = document.getElementById('tr-kyc-pending-data');
-        const verifiedData = document.getElementById('tr-kyc-verified-data');
-        if (data.status === 'pending'  && pendingData)  pendingData.textContent = submittedLine;
-        if (data.status === 'verified' && verifiedData) verifiedData.textContent = submittedLine;
+        if (data.status === 'pending')  loadAuthedImage('/api/auth/passport/image', document.getElementById('tr-kyc-pending-thumb'));
+        if (data.status === 'verified') loadAuthedImage('/api/auth/passport/image', document.getElementById('tr-kyc-verified-thumb'));
     } catch(e) { console.error('loadPassportStatus:', e); }
 }
 
-function fmtPassportNum(inp) {
-    const d = inp.value.replace(/\D/g,'').slice(0,10);
-    inp.value = d.length > 4 ? d.slice(0,4) + ' ' + d.slice(4) : d;
+function onPassportFileChosen(inp) {
+    const file = inp.files?.[0];
+    const submitBtn = document.getElementById('tr-kyc-submit-btn');
+    const msg = document.getElementById('tr-kyc-msg');
+    if (!file) return;
+    if (file.size > 8 * 1024 * 1024) {
+        if (msg) { msg.textContent = 'Файл слишком большой (макс. 8 МБ)'; msg.className = 'tr-msg err'; }
+        inp.value = '';
+        return;
+    }
+    _trPassportFile = file;
+    if (msg) { msg.textContent = ''; msg.className = 'tr-msg'; }
+    const preview = document.getElementById('tr-kyc-preview');
+    const empty   = document.getElementById('tr-kyc-drop-empty');
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = '';
+    if (empty) empty.style.display = 'none';
+    if (submitBtn) submitBtn.disabled = false;
 }
 
 async function submitPassport(btn) {
-    const fullName = (document.getElementById('tr-kyc-name')?.value   || '').trim();
-    const number   = (document.getElementById('tr-kyc-number')?.value || '').trim();
     const msg = document.getElementById('tr-kyc-msg');
+    if (!_trPassportFile) { if (msg) { msg.textContent = 'Выберите фото паспорта'; msg.className = 'tr-msg err'; } return; }
 
     const orig = btn.innerHTML;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
     btn.disabled = true;
 
-    const data = await api('POST', '/api/auth/passport', { full_name: fullName, number: number.replace(/\s/g,'') });
+    const fd = new FormData();
+    fd.append('photo', _trPassportFile);
+
+    let data;
+    try {
+        const res = await fetch('/api/auth/passport', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}`, 'ngrok-skip-browser-warning': '1' },
+            body: fd,
+        });
+        data = await res.json();
+    } catch(e) {
+        data = { success: false, error: 'Ошибка сети' };
+    }
 
     btn.innerHTML = orig; btn.disabled = false;
 
     if (data.success) {
         if (msg) { msg.textContent = ''; msg.className = 'tr-msg'; }
+        _trPassportFile = null;
         loadPassportStatus();
     } else if (msg) {
         msg.textContent = data.error || 'Ошибка'; msg.className = 'tr-msg err';
