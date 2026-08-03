@@ -8,8 +8,8 @@
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin>
-    <link rel="stylesheet" href="css/dashboard.css?v=52">
-    <link rel="preload" href="js/dashboard.js?v=35" as="script">
+    <link rel="stylesheet" href="css/dashboard.css?v=53">
+    <link rel="preload" href="js/dashboard.js?v=36" as="script">
 </head>
 <body>
 
@@ -1039,7 +1039,8 @@
                 </div>
 
                 <!-- Форма добавления -->
-                <div class="tr-form-wrap" id="tr-form-wrap" style="display:none">
+                <div class="modal-overlay" id="modal-trader-add">
+                <div class="tr-form-wrap" id="tr-form-wrap" onclick="event.stopPropagation()">
 
                     <!-- Шапка формы -->
                     <div class="tr-form-head">
@@ -1258,6 +1259,7 @@
 
                     </div><!-- /tr-layout -->
                 </div><!-- /tr-form-wrap -->
+                </div><!-- /modal-trader-add -->
 
             </div>
         </div>
@@ -1543,7 +1545,7 @@
 
 
 
-<script src="js/dashboard.js?v=35"></script>
+<script src="js/dashboard.js?v=36"></script>
 <script>
 (function(){
     document.addEventListener('contextmenu',function(e){e.preventDefault();});

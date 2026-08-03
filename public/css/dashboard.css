@@ -1278,12 +1278,16 @@ body::before{display:none;}
 }
 .tr-del-btn:hover{background:rgba(220,38,38,.1);color:var(--danger);border-color:rgba(220,38,38,.3);}
 
-/* ── Форма добавления ── */
-.tr-form-wrap{
-    background:var(--surface);border:1px solid var(--border);
-    border-radius:20px;padding:24px;
-    box-shadow:0 4px 24px rgba(0,0,0,.05);
+/* ── Форма добавления (в модалке) ── */
+#modal-trader-add .tr-form-wrap{
+    background:var(--surface);border:1px solid var(--border2);
+    border-radius:18px;padding:24px;
+    box-shadow:0 20px 60px rgba(0,0,0,.15);
+    width:100%;max-width:780px;max-height:90vh;overflow-y:auto;
+    transform:translateY(14px) scale(.97);
+    transition:transform .25s cubic-bezier(.4,0,.2,1);
 }
+#modal-trader-add.open .tr-form-wrap{transform:none;}
 
 .tr-form-head{
     display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;
@@ -1501,7 +1505,7 @@ body::before{display:none;}
 @media(max-width:480px){
     .tr-card-num{font-size:15px;letter-spacing:2px;}
     .tr-method-value{font-size:14px;}
-    .tr-form-wrap{padding:16px 14px;}
+    #modal-trader-add .tr-form-wrap{padding:16px 14px;}
 }
 
 /* ===== PROFILE MODAL ===== */
@@ -2008,6 +2012,14 @@ body::before{display:none;}
         width:36px;height:4px;border-radius:3px;
         background:var(--border2);margin:12px auto 0;
     }
+
+    #modal-trader-add .tr-form-wrap{
+        max-width:100%;width:100%;max-height:92vh;
+        border-radius:22px 22px 0 0;
+        transform:translateY(100%);
+        box-shadow:0 -8px 40px rgba(0,0,0,.2);
+    }
+    #modal-trader-add.open .tr-form-wrap{transform:translateY(0);}
 
     /* Currency picker → bottom sheet */
     .currency-picker{

@@ -1310,13 +1310,11 @@ async function deleteMethod(id) {
 
 function openAddMethod() {
     if (!_trVerified) { flash('Пройдите верификацию паспорта, чтобы добавить реквизит'); return; }
-    const w = document.getElementById('tr-form-wrap');
-    if (w) { w.style.display = ''; w.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
+    document.getElementById('modal-trader-add')?.classList.add('open');
 }
 
 function closeAddMethod() {
-    const w = document.getElementById('tr-form-wrap');
-    if (w) w.style.display = 'none';
+    document.getElementById('modal-trader-add')?.classList.remove('open');
     const msg = document.getElementById('tr-form-msg');
     if (msg) { msg.textContent = ''; msg.className = 'tr-msg'; }
     const inp = document.getElementById('tr-value');
